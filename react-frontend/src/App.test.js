@@ -6,3 +6,9 @@ test('renders site header', () => {
 	const titleElement = screen.getByText(/#BTW/i);
 	expect(titleElement).toBeInTheDocument();
 });
+
+test('renders map', () => {
+	render(<App />);
+	const mapElement = screen.getByTestId('google-map-react')
+	expect(mapElement).toBeVisible();
+});

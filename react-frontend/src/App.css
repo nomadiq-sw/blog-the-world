@@ -18,7 +18,7 @@
 	height: 6vh;
 	display: flex;
 	flex-direction: column;
-	align-items: start;
+	align-items: flex-start;
 	justify-content: center;
 	font-size: calc(6px + 1vmin);
 	color: white;
