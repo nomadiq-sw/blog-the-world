@@ -1,15 +1,15 @@
-import './App.css';
-import SimpleMap from './components/SimpleMap';
-import axios from 'axios';
-import {useEffect, useState} from 'react';
+import axios from 'axios'
+import {useEffect, useState} from 'react'
+import SimpleMap from './components/SimpleMap'
+import './App.css'
 
 function App() {
-	const [places, setPlaces] = useState([])
+	const [posts, setPosts] = useState([])
 
 	useEffect(() => {
 		axios.get("http://127.0.0.1:5000/markers").then(
 				(response) => {
-					setPlaces(response.data)
+					setPosts(response.data)
 				}
 		).catch(
 				(err) => {
@@ -18,7 +18,7 @@ function App() {
 		)
 	}, [])
 
-	if (!places || places.length === 0) { return null }
+	if (!posts || posts.length === 0) { return null }
 
 	return (
 		<div className="App">
@@ -26,10 +26,10 @@ function App() {
 				<h1>#BTW</h1>
 			</header>
 			<div>
-				<SimpleMap pins={places} className="Google-map"/>
+				<SimpleMap pins={posts} className="Google-map"/>
 			</div>
 		</div>
-	);
+	)
 }
 
 export default App

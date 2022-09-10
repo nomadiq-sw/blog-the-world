@@ -1,12 +1,12 @@
-import { useState } from 'react';
-import Marker from './Marker';
-import GoogleMapReact from 'google-map-react';
+import { useState } from 'react'
+import GoogleMapReact from 'google-map-react'
+import Marker from './Marker'
 
 const SimpleMap = (props) => {
-	const [center, setCenter] = useState({lat: 20.0, lng: 10.0 });
-	const [zoom, setZoom] = useState(2.5);
+	const [center, setCenter] = useState({lat: 20.0, lng: 10.0 })
+	const [zoom, setZoom] = useState(2.5)
 	return (
-		<div data-testid='google-map-react' style={{ height: '94vh', width: '100%' }}>
+		<div className={'googleMap'} data-testid='google-map-react' style={{ height: '94vh', width: '100%' }}>
 			<GoogleMapReact
 				bootstrapURLKeys={{ key: process.env.REACT_APP_MAPS_API_KEY }}
 				defaultCenter={center}
@@ -14,19 +14,20 @@ const SimpleMap = (props) => {
 				options={{
 					minZoomOverride: true,
 					minZoom: 2.5,
+					fullscreenControl: false,
 				}}
 			>
-				{props.pins.map((place) => (
+				{props.pins.map((post) => (
 					<Marker
-						key={place.id}
-						text={place.title}
-						lat={place.latitude}
-						lng={place.longitude}
+						key={post.id}
+						post={post}
+						lat={post.latitude}
+						lng={post.longitude}
 					/>
 				))}
 			</GoogleMapReact>
 		</div>
-	);
+	)
 }
 
-export default SimpleMap;
+export default SimpleMap
