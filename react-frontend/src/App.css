@@ -17,12 +17,9 @@
 	background-color: #484860;
 	height: 6vh;
 	display: flex;
-	flex-direction: column;
-	align-items: flex-start;
-	justify-content: center;
-	font-size: calc(6px + 1vmin);
-	color: white;
-	padding-left: 1%;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
 }
 
 .App-link {

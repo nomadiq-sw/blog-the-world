@@ -4,8 +4,8 @@ from datetime import date
 app = Flask(__name__)
 
 
-@app.route("/markers")
-def markers():
+@app.route("/posts")
+def posts():
 	test_response = (
 		{
 			'id': 1,
@@ -31,3 +31,8 @@ def markers():
 	response = jsonify(test_response)
 	response.headers.add("Access-Control-Allow-Origin", '*')
 	return response
+
+
+@app.route("/add-post", methods=['POST'])
+def add_post():
+	pass

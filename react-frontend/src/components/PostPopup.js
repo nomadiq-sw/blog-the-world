@@ -16,12 +16,16 @@ const PostPopup = ({post, trigger}) => {
 			       lineHeight: '1.5'
 		       }}
 		       arrowStyle={{color: 'rgba(40, 40, 40, 0.9)'}}
-		       on={['hover', 'focus']}
+		       on={['hover', 'focus', 'click']}
 		       position={['top center', 'top right', 'top left', 'bottom center', 'bottom left', 'bottom right']}
-		       keepTooltipInside='.googleMap'>
+		       keepTooltipInside='.map-container'>
 			<div>
 				<span>
-					<a style={{ fontWeight: 'bold', fontSize: '18px', color: 'white' }} href={post.url}>{post.title}</a>
+					<a style={{ fontWeight: 'bold', fontSize: '18px', color: 'white' }}
+					   href={post.url}
+					   target='_blank' rel='noreferrer'>
+						{post.title}
+					</a>
 				</span><br/>
 				<span>Added on {dateString}</span>
 			</div>
