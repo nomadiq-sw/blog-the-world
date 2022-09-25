@@ -13,7 +13,7 @@ const Wrapper = styled.div`
 	border-radius: 100%;
 	user-select: none;
 	transform: translate(-50%, -50%);
-	cursor: ${(props) => (props.onMouseoOver ? 'pointer' : 'default')};
+	cursor: ${(props) => (props.onMouseOver ? 'pointer' : 'default')};
 	&:hover {
 		z-index: 1;
 	}

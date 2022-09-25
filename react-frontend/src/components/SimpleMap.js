@@ -7,22 +7,16 @@ const SimpleMap = (props) => {
 	const [center, setCenter] = useState({lat: 20.0, lng: 10.0 })
 	const [zoom, setZoom] = useState(2.5)
 	const [menuState, setMenuState] = useState(false)
-	const [menuAnchor, setMenuAnchor] = useState({x: 0, y: 0})
+	const [menuPosition, setMenuPosition] = useState({lat: 20.0, lng: 10.0})
 
-	const handleContextMenu = useCallback((e) => {
-			e.preventDefault()
-			setMenuAnchor({x: e.x, y: e.y})
+	function handleGoogleApiLoaded(map, maps) {
+	  maps.event.addListener(map, "contextmenu", function(ev) {
+		  let latitude = ev.latLng.lat()
+		  let longitude = ev.latLng.lng()
+		  setMenuPosition({lat: latitude, lng: longitude})
 			setMenuState(true)
-		},
-		[setMenuState, setMenuAnchor]
-	)
-
-  useEffect(() => {
-	  document.addEventListener("contextmenu", handleContextMenu)
-	  return () => {
-		  document.removeEventListener("contextmenu", handleContextMenu)
-	  }
-  })
+	  })
+	}
 
 	return (
 		<GoogleMapReact
@@ -30,16 +24,17 @@ const SimpleMap = (props) => {
 			bootstrapURLKeys={{ key: process.env.REACT_APP_MAPS_API_KEY }}
 			defaultCenter={center}
 			defaultZoom={zoom}
-			yesIWantToUseGoogleMapApiInternals
 			options={{
 				minZoomOverride: true,
 				minZoom: 2.5,
 				fullscreenControl: false,
 			}}
+			yesIWantToUseGoogleMapApiInternals
+			onGoogleApiLoaded={({map, maps}) => handleGoogleApiLoaded(map, maps)}
 			onChange = {({center, zoom, bounds, ...other}) => {setMenuState(false)}}
 			onClick={() => {setMenuState(false)}}
 		>
-			<NewPostMenu state={menuState} anchor={menuAnchor}/>
+			<NewPostMenu state={menuState} lat={menuPosition.lat} lng={menuPosition.lng}/>
 			{props.pins.map((post) => (
 				<Marker
 					key={post.id}

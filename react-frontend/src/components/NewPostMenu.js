@@ -24,13 +24,13 @@ const Menu = styled(ControlledMenu)`
   }
 `
 
-const NewPostMenu = ({state, anchor}) => {
+const NewPostMenu = ({state}) => {
   const [menuProps, toggleMenu] = useMenuState()
 
 	toggleMenu(state)
 
 	return (
-    <Menu {...menuProps} anchorPoint={anchor} onClose={() => toggleMenu(false)}>
+    <Menu {...menuProps} aria-label='Add post' onClose={() => toggleMenu(false)}>
 	    <MenuItem>Add post</MenuItem>
     </Menu>
 	)
