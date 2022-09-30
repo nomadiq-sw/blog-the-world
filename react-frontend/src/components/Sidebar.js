@@ -11,7 +11,7 @@ const Sidebar = (props) => {
   return (
     <div>
       <Button variant="primary" onClick={handleShow} className="btn-sm me-2">
-        Filter
+        Log in
       </Button>
       <Offcanvas show={show} onHide={handleClose} {...props}>
         <Offcanvas.Header closeButton>
