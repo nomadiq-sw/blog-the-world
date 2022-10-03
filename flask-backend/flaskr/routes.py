@@ -1,6 +1,6 @@
-from .models import Languages, TravelerTypes, TripTypes
 from datetime import date
 from flask import jsonify, Blueprint
+from .models import Languages, TravelerTypes, TripTypes
 
 api = Blueprint('api', __name__)
 
