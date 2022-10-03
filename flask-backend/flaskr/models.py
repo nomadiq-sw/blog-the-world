@@ -48,6 +48,7 @@ class User(db.Model):
 	password = db.Column(db.String, nullable=False)
 	display_name = db.Column(db.String, nullable=True)
 	active = db.Column(db.Boolean)
+	posts = db.relationship('Post', backref='user', lazy=True)
 
 
 class Post(db.Model):
@@ -60,3 +61,4 @@ class Post(db.Model):
 	trip = db.Column(MutableList.as_mutable(db.Enum(TripTypes)), default=[])
 	latitude = db.Column(db.Float, nullable=False)
 	longitude = db.Column(db.Float, nullable=False)
+	user = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
