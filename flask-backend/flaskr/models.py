@@ -1,10 +1,6 @@
 import enum
-import jwt
-from flask import current_app
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.ext.mutable import MutableList
-from datetime import datetime, timedelta
-from flask_bcrypt import generate_password_hash
 
 db = SQLAlchemy()
 
@@ -50,40 +46,64 @@ class User(db.Model):
 	__tablename__ = "users"
 
 	id = db.Column(db.Integer, primary_key=True)
-	email = db.Column(db.String(254), unique=True, nullable=False)
-	password = db.Column(db.String(30), nullable=False)
+	email = db.Column(db.String(255), unique=True, nullable=False)
+	password = db.Column(db.String(255), nullable=False)
 	display_name = db.Column(db.String(30), nullable=True)
-	active = db.Column(db.Boolean, nullable=False, default=True)
-	admin = db.Column(db.Boolean, nullable=False, default=False)
+	is_active = db.Column(db.Boolean, nullable=False, default=True, server_default="true")
+	roles = db.Column(db.String(255), nullable=True)
 	posts = db.relationship('Post', backref='users', lazy=True)
 
-	def __init__(self, email, password, display=None, active=True, admin=False):
-		self.email = email
-		self.password = generate_password_hash(password, 10).decode('utf-8')
-		self.display_name = display
-		self.active = active
-		self.admin = admin
+	@property
+	def identity(self):
+		"""
+		*Required Attribute or Property*
 
-	def encode_auth_token(self):
+		flask-praetorian requires that the user class has an ``identity`` instance
+		attribute or property that provides the unique id of the user instance
+		"""
+		return self.id
+
+	@property
+	def rolenames(self):
+		"""
+		*Required Attribute or Property*
+
+		flask-praetorian requires that the user class has a ``rolenames`` instance
+		attribute or property that provides a list of strings that describe the roles
+		attached to the user instance
+		"""
 		try:
-			payload = {
-				'exp': datetime.utcnow() + timedelta(days=0, seconds=5),
-				'iat': datetime.utcnow(),
-				'sub': self.id
-			}
-			return jwt.encode(payload, current_app.config.get('JWT_SECRET_KEY'), algorithm='HS256')
+			if self.roles is not None:
+				return self.roles.split(",")
+			else:
+				return []
 		except Exception as e:
-			return e
+			return [e]
 
-	@staticmethod
-	def decode_auth_token(auth_token):
-		try:
-			payload = jwt.decode(auth_token, current_app.config.get('JWT_SECRET_KEY'), algorithms='HS256')
-			return payload['sub']
-		except jwt.ExpiredSignatureError:
-			return 'Signature expired. Please log in again.'
-		except jwt.InvalidTokenError:
-			return 'Invalid token. Please log in again.'
+	@classmethod
+	def lookup(cls, email):
+		"""
+		*Required Method*
+
+		flask-praetorian requires that the user class implements a ``lookup()``
+		class method that takes a single ``username`` argument and returns a user
+		instance if there is one that matches or ``None`` if there is not.
+		"""
+		return cls.query.filter_by(email=email).one_or_none()
+
+	@classmethod
+	def identify(cls, uid):
+		"""
+		*Required Method*
+
+		flask-praetorian requires that the user class implements an ``identify()``
+		class method that takes a single ``id`` argument and returns user instance if
+		there is one that matches or ``None`` if there is not.
+		"""
+		return cls.query.get(uid)
+
+	def is_valid(self):
+		return self.is_active
 
 
 class Post(db.Model):
