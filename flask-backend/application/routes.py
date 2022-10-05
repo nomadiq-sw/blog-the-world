@@ -16,7 +16,7 @@ def login():
 	issuing a JWT token.
 	.. example::
 	   $ curl http://localhost:5000/login -X POST \
-		 -d '{"username":"Walter","password":"calmerthanyouare"}'
+		 -d '{"email":"juan.gomez@realtalk.com","password":"verysecure"}'
 	"""
 	req = request.get_json(force=True)
 	email = req.get("email", None)

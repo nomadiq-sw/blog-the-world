@@ -115,7 +115,7 @@ class Post(db.Model):
 	url = db.Column(db.String(2048), nullable=False)
 	date = db.Column(db.Date, nullable=False)
 	traveler = db.Column(db.Enum(TravelerTypes), nullable=True)
-	trip = db.Column(MutableList.as_mutable(db.Enum(TripTypes)), default=[])
+	trip = db.Column(MutableList.as_mutable(db.PickleType), default=[], nullable=False)
 	latitude = db.Column(db.Float, nullable=False)
 	longitude = db.Column(db.Float, nullable=False)
 	user = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
