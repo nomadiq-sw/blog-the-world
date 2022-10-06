@@ -1,5 +1,5 @@
 from datetime import date
-from flask import jsonify, request, current_app, Blueprint
+from flask import jsonify, request, Blueprint
 from .models import Languages, TravelerTypes, TripTypes, User, Post, db
 from flask_mail import Mail
 from flask_cors import CORS
@@ -21,9 +21,9 @@ def signup():
 		db.session.add(new_user)
 		db.session.commit()
 		guard.send_registration_email(email, user=guard.authenticate(email, password))
-		return "Signup successful. Please check your e-mail.", 201
+		return jsonify("Signup successful. Please check your e-mail."), 201
 
-	return "This e-mail is already in use. Please log in to continue.", 409
+	return jsonify("This e-mail is already in use. Please log in to continue."), 409
 
 
 @api.route("/login", methods=["POST"])

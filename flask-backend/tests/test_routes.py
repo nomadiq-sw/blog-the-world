@@ -19,6 +19,15 @@ def test_signup_success(app, client, user_details):
 		assert b"Signup successful" in response.data
 
 
+def test_signup_existing_user(client, user, user_details):
+	response = client.post(
+		'/signup',
+		json={"email": user_details['email'], "password": user_details['password']}
+	)
+	assert response.status_code == 409
+	assert b"This e-mail is already in use." in response.data
+
+
 def test_login_success(client, user, user_details):
 	response = client.post(
 		'/login',
@@ -26,3 +35,19 @@ def test_login_success(client, user, user_details):
 	)
 	assert response.status_code == 200
 	assert b'{"access_token":' in response.data
+
+
+def test_login_wrong_mail(client, user, user_details):
+	response = client.post(
+		'/login',
+		json={"email": "not.a.user@realtalk.com", "password": user_details['password']}
+	)
+	assert response.status_code == 401
+
+
+def test_login_wrong_password(client, user, user_details):
+	response = client.post(
+		'/login',
+		json={"email": user_details['email'], "password": "wrong-password"}
+	)
+	assert response.status_code == 401
