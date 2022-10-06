@@ -2,7 +2,7 @@ import os
 from flask import Flask
 from flask_migrate import Migrate
 from .models import db, User
-from .routes import api, guard, cors
+from .routes import api, guard, cors, mail
 
 
 def create_app(test_config=None):
@@ -27,5 +27,6 @@ def create_app(test_config=None):
 	Migrate(app, db)
 	guard.init_app(app, User)
 	cors.init_app(app)
+	mail.init_app(app)
 
 	return app

@@ -1,12 +1,29 @@
 from datetime import date
-from flask import jsonify, request, Blueprint
-from .models import Languages, TravelerTypes, TripTypes
+from flask import jsonify, request, current_app, Blueprint
+from .models import Languages, TravelerTypes, TripTypes, User, Post, db
+from flask_mail import Mail
 from flask_cors import CORS
 from flask_praetorian import auth_required, roles_required, current_user, Praetorian
 
 api = Blueprint('api', __name__)
 guard = Praetorian()
 cors = CORS()
+mail = Mail()
+
+
+@api.route("/signup", methods=["POST"])
+def signup():
+	req = request.get_json(force=True)
+	email = req.get("email", None)
+	password = req.get("password", None)
+	if User.lookup(email) is None:
+		new_user = User(email=email, password=guard.hash_password(password), is_active=False)
+		db.session.add(new_user)
+		db.session.commit()
+		guard.send_registration_email(email, user=guard.authenticate(email, password))
+		return "Signup successful. Please check your e-mail.", 201
+
+	return "This e-mail is already in use. Please log in to continue.", 409
 
 
 @api.route("/login", methods=["POST"])
@@ -16,7 +33,7 @@ def login():
 	issuing a JWT token.
 	.. example::
 	   $ curl http://localhost:5000/login -X POST \
-		 -d '{"email":"juan.gomez@realtalk.com","password":"verysecure"}'
+		 -d '{"email":"juan.gomez@realtalk.com","password":"HappyGoLucky"}'
 	"""
 	req = request.get_json(force=True)
 	email = req.get("email", None)
@@ -24,32 +41,6 @@ def login():
 	user = guard.authenticate(email, password)
 	ret = {"access_token": guard.encode_jwt_token(user)}
 	return jsonify(ret)
-
-
-@api.route("/protected")
-@auth_required
-def protected():
-	"""
-	A protected endpoint. The auth_required decorator will require a header
-	containing a valid JWT
-	.. example::
-	   $ curl http://localhost:5000/protected -X GET \
-		 -H "Authorization: Bearer <your_token>"
-	"""
-	return jsonify(f"protected endpoint (allowed user {current_user().email})")
-
-
-@api.route("/protected_admin_required")
-@roles_required("admin")
-def protected_admin_required():
-	"""
-	A protected endpoint that requires a role. The roles_required decorator
-	will require that the supplied JWT includes the required roles
-	.. example::
-	   $ curl http://localhost:5000/protected_admin_required -X GET \
-		  -H "Authorization: Bearer <your_token>"
-	"""
-	return jsonify(f"protected_admin_required endpoint (allowed user {current_user().email})")
 
 
 @api.route("/posts")
@@ -84,5 +75,19 @@ def posts():
 
 
 @api.route("/add-post", methods=['POST'])
+@auth_required
 def add_post():
 	pass
+
+
+@api.route("/delete-post", methods=["POST"])
+@roles_required("admin")
+def delete_post():
+	"""
+	A protected endpoint that requires a role. The roles_required decorator
+	will require that the supplied JWT includes the required roles
+	.. example::
+	   $ curl http://localhost:5000/protected_admin_required -X GET \
+		  -H "Authorization: Bearer <your_token>"
+	"""
+	return jsonify(f"protected_admin_required endpoint (allowed user {current_user().email})")
