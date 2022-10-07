@@ -11,6 +11,13 @@ def app():
 
 
 @pytest.fixture()
+def dbx(app):
+	with app.app_context():
+		db.create_all()
+		yield db
+
+
+@pytest.fixture()
 def client(app):
 	return app.test_client()
 
@@ -34,14 +41,13 @@ def user_details():
 
 
 @pytest.fixture()
-def user(app, guard, user_details):
-	with app.app_context():
-		db.create_all()
-		test_user = User(
-			email=user_details['email'],
-			password=guard.hash_password(user_details['password'])
-		)
-		db.session.add(test_user)
-		db.session.commit()
-		user = db.session.query(User).get(1)
-		yield user
+def user(app, dbx, guard, user_details):
+	test_user = User(
+		email=user_details['email'],
+		password=guard.hash_password(user_details['password']),
+		is_active=True
+	)
+	dbx.session.add(test_user)
+	dbx.session.commit()
+	user = dbx.session.query(User).get(1)
+	yield user
