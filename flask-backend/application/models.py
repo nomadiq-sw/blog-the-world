@@ -49,7 +49,7 @@ class User(db.Model):
 	email = db.Column(db.String(255), unique=True, nullable=False)
 	password = db.Column(db.String(255), nullable=False)
 	display_name = db.Column(db.String(30), nullable=True)
-	is_active = db.Column(db.Boolean, nullable=False, default=True, server_default="true")
+	is_active = db.Column(db.Boolean, nullable=False, default=False, server_default="false")
 	roles = db.Column(db.String(255), nullable=True)
 	posts = db.relationship('Post', backref='users', lazy=True)
 
@@ -115,7 +115,8 @@ class Post(db.Model):
 	url = db.Column(db.String(2048), nullable=False)
 	date = db.Column(db.Date, nullable=False)
 	traveler = db.Column(db.Enum(TravelerTypes), nullable=True)
-	trip = db.Column(MutableList.as_mutable(db.PickleType), default=[], nullable=False)
+	trip = db.Column(MutableList.as_mutable(db.PickleType), default=[])
 	latitude = db.Column(db.Float, nullable=False)
 	longitude = db.Column(db.Float, nullable=False)
+	verified = db.Column(db.Boolean, nullable=False, default=False, server_default="false")
 	user = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)

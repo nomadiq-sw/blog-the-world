@@ -17,13 +17,16 @@ def signup():
 	email = req.get("email", None)
 	password = req.get("password", None)
 	if User.lookup(email) is None:
-		new_user = User(email=email, password=guard.hash_password(password), is_active=False)
+		new_user = User(email=email, password=guard.hash_password(password))
 		db.session.add(new_user)
 		db.session.commit()
 		guard.send_registration_email(email, user=guard.authenticate(email, password))
-		return jsonify("Signup successful. Please check your e-mail."), 201
+		return jsonify("Signup successful. Please check your e-mail inbox."), 201
 
 	return jsonify("This e-mail is already in use. Please log in to continue."), 409
+
+
+@api.route('/signup-confirmation/')
 
 
 @api.route("/login", methods=["POST"])
