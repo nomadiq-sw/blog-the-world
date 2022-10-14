@@ -107,7 +107,25 @@ def test_forgotten_password_invalid_mail(client, user, outbox):
 	assert len(outbox) == 0
 
 
-def test_password_reset_valid(client, user, guard):
+def test_password_reset_valid_get(client, user, guard):
+	token = guard.encode_jwt_token(user, bypass_user_check=True, is_reset_token=True)
+	response = client.get(
+		f'/reset-password/{token}'
+	)
+	assert response.status_code == 200
+	assert b"Please enter a new password." in response.data
+
+
+def test_password_reset_invalid_token_get(client, user, guard):
+	token = guard.encode_jwt_token(user, bypass_user_check=True, is_reset_token=True)
+	response = client.get(
+		f'/reset-password/{token}abc'
+	)
+	assert response.status_code == 400
+	assert b"Invalid token in reset URL." in response.data
+
+
+def test_password_reset_valid_post(client, user, guard):
 	token = guard.encode_jwt_token(user, bypass_user_check=True, is_reset_token=True)
 	response = client.post(
 		f'/reset-password/{token}',
@@ -118,7 +136,7 @@ def test_password_reset_valid(client, user, guard):
 	assert guard.authenticate(user.email, "aNewSecurePassword") is user
 
 
-def test_password_reset_invalid_token(client, user, guard):
+def test_password_reset_invalid_token_post(client, user, guard):
 	token = guard.encode_jwt_token(user, bypass_user_check=True, is_registration_token=True)
 	response = client.post(
 		f'/reset-password/{token}',
