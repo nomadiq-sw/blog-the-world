@@ -1,8 +1,9 @@
 import os
 from flask import Flask
 from flask_migrate import Migrate
+from flask_mail import Mail
 from .models import db, User
-from .routes import api, guard, cors, mail
+from .routes import api, guard, cors
 
 
 def create_app(test_config=None):
@@ -25,8 +26,10 @@ def create_app(test_config=None):
 
 	db.init_app(app)
 	Migrate(app, db)
+
 	guard.init_app(app, User)
 	cors.init_app(app)
-	mail.init_app(app)
+
+	Mail(app)
 
 	return app
