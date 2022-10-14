@@ -1,4 +1,4 @@
-from datetime import date
+import json
 from flask import jsonify, request, render_template, current_app, Blueprint
 from .models import Languages, TravelerTypes, TripTypes, User, Post, db
 from flask_cors import CORS
@@ -113,35 +113,16 @@ def reset_password(token):
 	except (InvalidTokenHeader, InvalidResetToken, MissingToken, MisusedRegistrationToken):
 		return jsonify("Invalid token in reset URL. Please renew your password reset request."), 400
 
+
 @api.route("/posts")
 def posts():
-	test_response = (
-		{
-			'id': 1,
-			'title': "My awesome blog post",
-			'language': Languages.EN,
-			'url': "https://www.blog.com/posts/my-awesome-blog-post/",
-			'date': date.today(),
-			'traveler': TravelerTypes.Solo,
-			'trip': [TripTypes.Backpack],
-			'latitude': 37.26801,
-			'longitude': -90.2022
-		},
-		{
-			'id': 2,
-			'title': "My other blog post",
-			'language': Languages.EN,
-			'url': "https://www.blog.com/posts/my-other-blog-post/",
-			'date': date(2021, 11, 1),
-			'traveler': TravelerTypes.Family,
-			'trip': [TripTypes.Caravan, TripTypes.Roadtrip],
-			'latitude': -27.26801,
-			'longitude': 120.2022
-		}
-	)
-	response = jsonify(test_response)
+	all_posts = Post.query.all()
+	post_list = []
+	for post in all_posts:
+		post_list.append(json.dumps(post.to_dict()))
+	response = jsonify(post_list)
 	response.headers.add("Access-Control-Allow-Origin", '*')
-	return response
+	return response, 200
 
 
 @api.route("/add-post", methods=['POST'])

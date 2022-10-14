@@ -1,6 +1,7 @@
 import enum
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.ext.mutable import MutableList
+from sqlalchemy_serializer import SerializerMixin
 
 db = SQLAlchemy()
 
@@ -106,8 +107,9 @@ class User(db.Model):
 		return self.is_active
 
 
-class Post(db.Model):
+class Post(db.Model, SerializerMixin):
 	__tablename__ = "posts"
+	serialize_only = ('id', 'title', 'url', 'language', 'date', 'traveler', 'trip', 'latitude', 'longitude')
 
 	id = db.Column(db.Integer, primary_key=True)
 	title = db.Column(db.String(180), nullable=False)

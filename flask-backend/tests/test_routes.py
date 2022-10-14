@@ -1,11 +1,13 @@
+import json
 from application.models import User
 
 
-def test_get_posts(client):
+def test_get_posts(app, dbx, client, post_details, post):
 	response = client.get('/posts')
 	assert response.status_code == 200
-	assert b"My awesome blog post" in response.data
-	assert b"My other blog post" in response.data
+	resp_list = json.loads(response.data.decode('utf-8'))
+	resp_dict = json.loads(resp_list[0])
+	assert resp_dict['title'] == post_details['title']
 
 
 def test_signup_success(app, dbx, client, user_details, outbox):
