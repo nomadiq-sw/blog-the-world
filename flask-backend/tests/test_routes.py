@@ -8,22 +8,26 @@ def test_get_posts(client):
 	assert b"My other blog post" in response.data
 
 
-def test_signup_success(app, dbx, client, user_details):
+def test_signup_success(app, dbx, client, user_details, outbox):
 	response = client.post(
 		'/signup',
 		json={"email": user_details['email'], "password": user_details['password']}
 	)
 	assert response.status_code == 201
 	assert b"Signup successful" in response.data
+	assert len(outbox) == 1
+	assert outbox[0].subject == "Confirm your signup"
+	assert "You have successfully signed up to Blog The World" in outbox[0].html
 
 
-def test_signup_existing_user(client, user, user_details):
+def test_signup_existing_user(client, user, user_details, outbox):
 	response = client.post(
 		'/signup',
 		json={"email": user_details['email'], "password": user_details['password']}
 	)
 	assert response.status_code == 409
 	assert b"This e-mail is already in use." in response.data
+	assert len(outbox) == 0
 
 
 def test_signup_confirmation_valid(app, dbx, client, guard, user_details):
@@ -81,22 +85,26 @@ def test_login_invalid_password(client, user, user_details):
 	assert response.status_code == 401
 
 
-def test_forgotten_password_valid(client, user, user_details):
+def test_forgotten_password_valid(client, user, user_details, outbox):
 	response = client.post(
 		'/forgotten-password',
 		json={"email": user_details['email']}
 	)
 	assert response.status_code == 200
 	assert b"Password reset request successful." in response.data
+	assert len(outbox) == 1
+	assert outbox[0].subject == "Reset your password"
+	assert "You have requested to reset your password" in outbox[0].html
 
 
-def test_forgotten_password_invalid_mail(client, user):
+def test_forgotten_password_invalid_mail(client, user, outbox):
 	response = client.post(
 		'/forgotten-password',
 		json={"email": "not.a.user@realtalk.com"}
 	)
 	assert response.status_code == 400
 	assert b"This e-mail is not associated with any user." in response.data
+	assert len(outbox) == 0
 
 
 def test_password_reset_valid(client, user, guard):

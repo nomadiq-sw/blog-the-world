@@ -2,6 +2,7 @@ import pytest
 from application import create_app
 from application.models import db, User
 from flask_praetorian import Praetorian
+from flask_mail import Mail
 
 
 @pytest.fixture()
@@ -15,6 +16,14 @@ def dbx(app):
 	with app.app_context():
 		db.create_all()
 		yield db
+
+
+@pytest.fixture()
+def outbox(app):
+	with app.app_context():
+		mail = Mail(app)
+		with mail.record_messages() as box:
+			yield box
 
 
 @pytest.fixture()

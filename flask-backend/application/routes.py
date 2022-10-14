@@ -3,7 +3,7 @@ from flask import jsonify, request, render_template, current_app, Blueprint
 from .models import Languages, TravelerTypes, TripTypes, User, Post, db
 from flask_mail import Mail
 from flask_cors import CORS
-from flask_praetorian import auth_required, roles_required, current_user, Praetorian
+from flask_praetorian import auth_required, roles_required, Praetorian
 from flask_praetorian.exceptions import (
 	InvalidTokenHeader,
 	InvalidRegistrationToken,
