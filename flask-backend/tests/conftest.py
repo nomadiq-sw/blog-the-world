@@ -59,4 +59,4 @@ def user(app, dbx, guard, user_details):
 	dbx.session.add(test_user)
 	dbx.session.commit()
 	user = dbx.session.query(User).get(1)
-	yield user
+	return user
