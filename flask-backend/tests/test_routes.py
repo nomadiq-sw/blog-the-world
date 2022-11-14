@@ -6,7 +6,7 @@ def test_get_posts(app, dbx, client, post_details, post):
 	response = client.get('/posts')
 	assert response.status_code == 200
 	resp_list = json.loads(response.data.decode('utf-8'))
-	resp_dict = json.loads(resp_list[0])
+	resp_dict = resp_list[0]
 	assert resp_dict['title'] == post_details['title']
 
 

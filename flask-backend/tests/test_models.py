@@ -17,7 +17,7 @@ def test_post_creation(app, dbx, user):
 	test_lang = Languages.EN
 	test_date = date.today()
 	test_traveler = TravelerTypes.Family
-	test_trip = [TripTypes.Camping, TripTypes.Roadtrip]
+	test_trip = {TripTypes.Camping, TripTypes.Roadtrip}
 	test_latitude = 37.26801
 	test_longitude = -90.2022
 	post = Post(

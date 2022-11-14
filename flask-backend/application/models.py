@@ -1,6 +1,6 @@
 import enum
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.ext.mutable import MutableList
+from sqlalchemy.ext.mutable import MutableSet
 from sqlalchemy_serializer import SerializerMixin
 
 db = SQLAlchemy()
@@ -37,7 +37,8 @@ class TripTypes(str, enum.Enum):
 	Business = 'Business trip'
 	Camping = 'Camping'
 	Caravan = 'Camper/caravan'
-	Hiking = 'Hiking/cycling'
+	Cycling = 'Cycling'
+	Hiking = 'Hiking'
 	Mini = 'Mini-break'
 	Package = 'Package holiday'
 	Roadtrip = 'Roadtrip'
@@ -117,7 +118,7 @@ class Post(db.Model, SerializerMixin):
 	url = db.Column(db.String(2048), nullable=False)
 	date = db.Column(db.Date, nullable=False)
 	traveler = db.Column(db.Enum(TravelerTypes), nullable=True)
-	trip = db.Column(MutableList.as_mutable(db.PickleType), default=[])
+	trip = db.Column(MutableSet.as_mutable(db.PickleType), default=[])
 	latitude = db.Column(db.Float, nullable=False)
 	longitude = db.Column(db.Float, nullable=False)
 	verified = db.Column(db.Boolean, nullable=False, default=False, server_default="false")

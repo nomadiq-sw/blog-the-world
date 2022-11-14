@@ -152,7 +152,7 @@ db.sqlite3-journal
 # Flask stuff:
 instance/
 .webassets-cache
-*/project.db
+instance/project.db
 
 # Scrapy stuff:
 .scrapy

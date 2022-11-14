@@ -19,7 +19,7 @@ function App() {
 		)
 	}, [])
 
-	if (!posts || posts.length === 0) { return null }
+	if (!posts) { return null }
 
 	return (
 		<div className='App'>

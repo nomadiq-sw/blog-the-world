@@ -1,5 +1,5 @@
 import json
-from flask import jsonify, request, render_template, current_app, Blueprint
+from flask import jsonify, make_response, request, render_template, current_app, Blueprint
 from .models import Languages, TravelerTypes, TripTypes, User, Post, db
 from flask_cors import CORS
 from flask_praetorian import auth_required, roles_required, Praetorian
@@ -116,11 +116,11 @@ def reset_password(token):
 
 @api.route("/posts")
 def posts():
-	all_posts = Post.query.all()
+	all_posts = db.session.execute(db.select(Post)).all()
 	post_list = []
 	for post in all_posts:
-		post_list.append(json.dumps(post.to_dict()))
-	response = jsonify(post_list)
+		post_list.append(post[0].to_dict())
+	response = make_response(post_list)  # N.B. DO NOT JSONIFY: Flask does it automatically
 	response.headers.add("Access-Control-Allow-Origin", '*')
 	return response, 200
 
