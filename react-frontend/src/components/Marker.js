@@ -1,6 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
-import PostPopup from "./PostPopup"
+import PostPopup from './PostPopup'
 
 const Wrapper = styled.div`
 	position: absolute;

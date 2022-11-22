@@ -121,7 +121,6 @@ def posts():
 	for post in all_posts:
 		post_list.append(post[0].to_dict())
 	response = make_response(post_list)  # N.B. DO NOT JSONIFY: Flask does it automatically
-	response.headers.add("Access-Control-Allow-Origin", '*')
 	return response, 200
 
 

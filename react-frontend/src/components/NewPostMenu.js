@@ -1,8 +1,8 @@
-import {ControlledMenu, MenuItem} from "@szhsin/react-menu"
-import {useMenuState} from "@szhsin/react-menu"
-import "@szhsin/react-menu/dist/core.css"
-import {menuSelector, menuItemSelector} from "@szhsin/react-menu/style-utils"
-import styled from "styled-components"
+import {ControlledMenu, MenuItem} from '@szhsin/react-menu'
+import {useMenuState} from '@szhsin/react-menu'
+import '@szhsin/react-menu/dist/core.css'
+import {menuSelector, menuItemSelector} from '@szhsin/react-menu/style-utils'
+import styled from 'styled-components'
 
 const Menu = styled(ControlledMenu)`
   ${menuSelector.name} {

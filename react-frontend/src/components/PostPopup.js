@@ -1,4 +1,4 @@
-import Popup from "reactjs-popup"
+import Popup from 'reactjs-popup'
 
 const PostPopup = ({post, trigger}) => {
 	const dateString = new Date(post.date).toLocaleDateString()

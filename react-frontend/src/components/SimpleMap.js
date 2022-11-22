@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import GoogleMapReact from 'google-map-react'
 import Marker from './Marker'
-import NewPostMenu from "./NewPostMenu"
+import NewPostMenu from './NewPostMenu'
 
 const SimpleMap = (props) => {
 	const [center, setCenter] = useState({lat: 20.0, lng: 10.0 })

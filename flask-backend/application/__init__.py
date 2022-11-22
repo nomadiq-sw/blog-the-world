@@ -14,6 +14,11 @@ def create_app(test_config=None):
 		DATABASE=os.path.join(app.instance_path, 'project.db'),
 	)
 
+	@app.after_request
+	def after_request(response):
+		response.headers['Access-Control-Allow-Origin'] = "http://localhost:3000"
+		return response
+
 	if test_config is None:
 		app.config.from_pyfile('config.py', silent=True)
 	else:
