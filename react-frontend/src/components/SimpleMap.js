@@ -9,7 +9,7 @@ const SimpleMap = (props) => {
 	const [menuState, setMenuState] = useState(false)
 	const [menuPosition, setMenuPosition] = useState({lat: 20.0, lng: 10.0})
 
-	function handleGoogleApiLoaded(map, maps) {
+	const handleGoogleApiLoaded = (map, maps) => {
 	  maps.event.addListener(map, "contextmenu", function(ev) {
 		  let latitude = ev.latLng.lat()
 		  let longitude = ev.latLng.lng()
