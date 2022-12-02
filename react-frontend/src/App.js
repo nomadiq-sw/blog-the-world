@@ -1,6 +1,5 @@
 import axios from 'axios'
 import {useEffect, useState} from 'react'
-import {BrowserRouter} from 'react-router-dom'
 import SimpleMap from './components/SimpleMap'
 import Sidebar from './components/Sidebar'
 import './App.css'
@@ -23,17 +22,15 @@ function App() {
 	if (!posts) { return null }
 
 	return (
-		<BrowserRouter>
-			<div className='App'>
-				<header className='App-header'>
-					<h1 style={{fontSize:36, paddingLeft:'8px', color:'white'}}>#BTW</h1>
-					<Sidebar placement='end'/>
-				</header>
-				<div className='map-container' style={{ height: '94vh', width: '100%' }}>
-					<SimpleMap pins={posts}/>
-				</div>
+		<div className='App'>
+			<header className='App-header'>
+				<h1 style={{fontSize:36, paddingLeft:'8px', color:'white'}}>#BTW</h1>
+				<Sidebar placement='end'/>
+			</header>
+			<div className='map-container' style={{ height: '94vh', width: '100%' }}>
+				<SimpleMap pins={posts}/>
 			</div>
-		</BrowserRouter>
+		</div>
 	)
 }
 
