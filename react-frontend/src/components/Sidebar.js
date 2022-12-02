@@ -17,6 +17,7 @@ const Sidebar = (props) => {
     password: ""
   })
   const formRef = useRef()
+  const emailRef = useRef()
   const validRef = useRef(false)
   const {setToken, getToken, removeToken} = useToken()
   const [loggedIn, setLoggedIn] = useState(getToken)
@@ -33,7 +34,7 @@ const Sidebar = (props) => {
 
   const handleShow = () => {
     if (loggedIn) { handleLogOut() }
-    else setShow(true)
+    else { setShow(true) }
   }
 
   const handleLogOut = () => {
@@ -54,6 +55,33 @@ const Sidebar = (props) => {
     setErrorContent(response.data.message)
     setSuccessShow(false)
     setErrorShow(true)
+  }
+
+  const handleReset = (event) => {
+    const input = emailRef.current
+    validRef.current = input.checkValidity()
+    input.reportValidity()
+    if (validRef.current) {
+      axios({
+        method: "POST",
+        url: process.env.REACT_APP_FLASK_API_URL + "/forgotten-password",
+        data : {
+          email: loginForm.email
+        }
+      }).then((response) => {
+        console.log(response.status)
+        console.log(response.data)
+        if (response.status === 200) {
+          setSuccessContent(response.data.message)
+          setErrorShow(false)
+          setSuccessShow(true)
+        }
+      }).catch((error) => {
+        if (error.response) {
+          handleError(error.response)
+        }
+      })
+    }
   }
 
   const clearForm = (event) => {
@@ -145,6 +173,7 @@ const Sidebar = (props) => {
             <Form.Group className="mb-2">
               <Form.Label>E-mail address</Form.Label>
               <Form.Control onChange={handleChange}
+                            ref={emailRef}
                             required
                             type="email"
                             name="email"
@@ -164,10 +193,24 @@ const Sidebar = (props) => {
             <span className="text-black-50">
               By registering, you accept the terms & conditions and privacy policy.
             </span><br className="mb-2"/>
-            <Button type="submit" className="w-25 me-2">Log in</Button>
-            <Button type="button" className="w-25 btn-secondary" onClick={registerUser}>Register</Button>
+            <div className="container g-0">
+              <div className="row justify-content-start g-0">
+                <div className="col-3 pe-2">
+                  <Button type="submit" className="w-100">Log in</Button>
+                </div>
+                <div className="col-3 pb-2">
+                  <Button type="button" className="w-100 btn-secondary" onClick={registerUser}>Register</Button>
+                </div>
+              </div>
+              <div className="row justify-content-start g-0">
+                <div className="col-6">
+                  <Button type="button" className="w-100 btn-light" onClick={handleReset}>
+                    <span className="text-black-50">I forgot my password</span>
+                  </Button>
+                </div>
+              </div>
+            </div>
           </Form>
-          <a href={}>I forgot my password</a>
         </Offcanvas.Body>
       </Offcanvas>
     </div>
