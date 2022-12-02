@@ -17,6 +17,10 @@ guard = Praetorian()
 cors = CORS()
 
 
+def jsonify_message(message):
+	return jsonify({'message': message})
+
+
 @api.route("/signup", methods=["POST"])
 def signup():
 	req = request.get_json(force=True)
@@ -38,9 +42,9 @@ def signup():
 			user=new_user,
 			subject="Confirm your signup"
 		)
-		return jsonify("Signup successful. Please check your e-mail inbox."), 201
+		return jsonify_message("Signup successful. Please check your e-mail inbox."), 201
 
-	return jsonify("This e-mail is already in use. Please log in to continue."), 409
+	return jsonify_message("This e-mail is already in use. Please log in to continue."), 409
 
 
 @api.route('/confirm-signup/<token>')
@@ -50,11 +54,11 @@ def confirm_signup(token):
 		if token_user and not token_user.is_valid():
 			token_user.is_active = True
 			db.session.commit()
-			return jsonify("Thank you for confirming your signup. You may now log in."), 200
+			return jsonify_message("Thank you for confirming your signup. You may now log in."), 200
 		else:
-			return jsonify("Invalid request. If you are already registered, please log in to continue."), 400
+			return jsonify_message("Invalid request. If you are already registered, please log in to continue."), 400
 	except (InvalidTokenHeader, InvalidRegistrationToken, MissingToken, MisusedResetToken):
-		return jsonify("Invalid token in confirmation URL. Please renew your signup request."), 400
+		return jsonify_message("Invalid token in confirmation URL. Please renew your signup request."), 400
 
 
 @api.route("/login", methods=["POST"])
@@ -91,9 +95,9 @@ def forgotten_password():
 			template=html,
 			subject="Reset your password"
 		)
-		return jsonify("Password reset request successful. Please check your e-mail inbox."), 200
+		return jsonify_message("Password reset request successful. Please check your e-mail inbox."), 200
 
-	return jsonify("This e-mail is not associated with any user. Please sign up to continue."), 400
+	return jsonify_message("This e-mail is not associated with any user. Please sign up to continue."), 400
 
 
 @api.route('/reset-password/<token>', methods=["GET", "POST"])
@@ -106,12 +110,12 @@ def reset_password(token):
 				new_pwd = req.get("new_password", None)
 				token_user.password = guard.hash_password(new_pwd)
 				db.session.commit()
-				return jsonify("Password reset successful. You may now log in."), 200
+				return jsonify_message("Password reset successful. You may now log in."), 200
 			else:
-				return jsonify("Please enter a new password."), 200
-		return jsonify("Invalid request. No user found matching supplied token."), 400
+				return jsonify_message("Please enter a new password."), 200
+		return jsonify_message("Invalid request. No user found matching supplied token."), 400
 	except (InvalidTokenHeader, InvalidResetToken, MissingToken, MisusedRegistrationToken):
-		return jsonify("Invalid token in reset URL. Please renew your password reset request."), 400
+		return jsonify_message("Invalid token in reset URL. Please renew your password reset request."), 400
 
 
 @api.route("/posts")
