@@ -6,7 +6,8 @@ import {
 } from "react-router-dom";
 import './index.css'
 import App from './App'
-import PasswordResetModal, {loader as tokenLoader} from './components/PasswordResetModal'
+import PasswordResetModal, {loader as resetTokenLoader} from './components/PasswordResetModal'
+import ConfirmSignupModal, {loader as signupTokenLoader} from './components/ConfirmSignupModal'
 import reportWebVitals from './reportWebVitals'
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css'
 
@@ -16,9 +17,14 @@ const router = createBrowserRouter([
 		element: <App/>,
 		children: [
 			{
-				path: 'reset-password/:token',
+				path: "reset-password/:token",
 				element: <PasswordResetModal/>,
-				loader: tokenLoader
+				loader: resetTokenLoader
+			},
+			{
+				path: "confirm-signup/:token",
+				element: <ConfirmSignupModal/>,
+				loader: signupTokenLoader
 			}
 		]
 	}
