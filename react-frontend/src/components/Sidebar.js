@@ -57,33 +57,6 @@ const Sidebar = (props) => {
     setErrorShow(true)
   }
 
-  const handleReset = (event) => {
-    const input = emailRef.current
-    validRef.current = input.checkValidity()
-    input.reportValidity()
-    if (validRef.current) {
-      axios({
-        method: "POST",
-        url: process.env.REACT_APP_FLASK_API_URL + "/forgotten-password",
-        data : {
-          email: loginForm.email
-        }
-      }).then((response) => {
-        console.log(response.status)
-        console.log(response.data)
-        if (response.status === 200) {
-          setSuccessContent(response.data.message)
-          setErrorShow(false)
-          setSuccessShow(true)
-        }
-      }).catch((error) => {
-        if (error.response) {
-          handleError(error.response)
-        }
-      })
-    }
-  }
-
   const clearForm = (event) => {
     setLoginForm(({
       email: loginForm.email,
@@ -146,6 +119,34 @@ const Sidebar = (props) => {
     }
   }
 
+  const handleForgottenPassword = (event) => {
+    const input = emailRef.current
+    validRef.current = input.checkValidity()
+    input.reportValidity()
+    if (validRef.current) {
+      axios({
+        method: "POST",
+        url: process.env.REACT_APP_FLASK_API_URL + "/forgotten-password",
+        data: {
+          email: loginForm.email
+        }
+      }).then((response) => {
+        console.log(response.status)
+        console.log(response.data)
+        if (response.status === 200) {
+          setSuccessContent(response.data.message)
+          setErrorShow(false)
+          setSuccessShow(true)
+        }
+      }).catch((error) => {
+        if (error.response) {
+          handleError(error.response)
+        }
+      })
+    }
+    clearForm(event)
+  }
+
   const handleChange = (event) => {
     const {value, name} = event.target
     setLoginForm(prevNote => ({
@@ -204,7 +205,7 @@ const Sidebar = (props) => {
               </div>
               <div className="row justify-content-start g-0">
                 <div className="col-6">
-                  <Button type="button" className="w-100 btn-light" onClick={handleReset}>
+                  <Button type="button" className="w-100 btn-light" onClick={handleForgottenPassword}>
                     <span className="text-black-50">I forgot my password</span>
                   </Button>
                 </div>

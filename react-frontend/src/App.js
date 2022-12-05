@@ -2,6 +2,7 @@ import axios from 'axios'
 import {useEffect, useState} from 'react'
 import SimpleMap from './components/SimpleMap'
 import Sidebar from './components/Sidebar'
+import {Outlet} from 'react-router-dom'
 import './App.css'
 
 function App() {
@@ -28,6 +29,7 @@ function App() {
 				<Sidebar placement='end'/>
 			</header>
 			<div className='map-container' style={{ height: '94vh', width: '100%' }}>
+				<Outlet/>
 				<SimpleMap pins={posts}/>
 			</div>
 		</div>

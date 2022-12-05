@@ -93,7 +93,7 @@ def test_forgotten_password_valid(client, user, user_details, outbox):
 		json={"email": user_details['email']}
 	)
 	assert response.status_code == 200
-	assert b"Password reset request successful." in response.data
+	assert b"We've sent you a link to reset your password." in response.data
 	assert len(outbox) == 1
 	assert outbox[0].subject == "Reset your password"
 	assert "You have requested to reset your password" in outbox[0].html
@@ -109,36 +109,18 @@ def test_forgotten_password_invalid_mail(client, user, outbox):
 	assert len(outbox) == 0
 
 
-def test_password_reset_valid_get(client, user, guard):
-	token = guard.encode_jwt_token(user, bypass_user_check=True, is_reset_token=True)
-	response = client.get(
-		f'/reset-password/{token}'
-	)
-	assert response.status_code == 200
-	assert b"Please enter a new password." in response.data
-
-
-def test_password_reset_invalid_token_get(client, user, guard):
-	token = guard.encode_jwt_token(user, bypass_user_check=True, is_reset_token=True)
-	response = client.get(
-		f'/reset-password/{token}abc'
-	)
-	assert response.status_code == 400
-	assert b"Invalid token in reset URL." in response.data
-
-
-def test_password_reset_valid_post(client, user, guard):
+def test_password_reset_valid_token(client, user, guard):
 	token = guard.encode_jwt_token(user, bypass_user_check=True, is_reset_token=True)
 	response = client.post(
 		f'/reset-password/{token}',
 		json={"new_password": "aNewSecurePassword"}
 	)
-	assert response.status_code == 200
+	assert response.status_code == 201
 	assert b"Password reset successful." in response.data
 	assert guard.authenticate(user.email, "aNewSecurePassword") is user
 
 
-def test_password_reset_invalid_token_post(client, user, guard):
+def test_password_reset_invalid_token(client, user, guard):
 	token = guard.encode_jwt_token(user, bypass_user_check=True, is_registration_token=True)
 	response = client.post(
 		f'/reset-password/{token}',

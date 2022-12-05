@@ -95,24 +95,21 @@ def forgotten_password():
 			template=html,
 			subject="Reset your password"
 		)
-		return jsonify_message("Password reset request successful. Please check your e-mail inbox."), 200
+		return jsonify_message("We've sent you a link to reset your password. Please check your e-mail inbox."), 200
 
 	return jsonify_message("This e-mail is not associated with any user. Please sign up to continue."), 400
 
 
-@api.route('/reset-password/<token>', methods=["GET", "POST"])
+@api.route('/reset-password/<token>', methods=["POST"])
 def reset_password(token):
 	try:
 		token_user = guard.validate_reset_token(token)
 		if token_user is not None:
-			if request.method == "POST":
-				req = request.get_json(force=True)
-				new_pwd = req.get("new_password", None)
-				token_user.password = guard.hash_password(new_pwd)
-				db.session.commit()
-				return jsonify_message("Password reset successful. You may now log in."), 200
-			else:
-				return jsonify_message("Please enter a new password."), 200
+			req = request.get_json(force=True)
+			new_pwd = req.get("new_password", None)
+			token_user.password = guard.hash_password(new_pwd)
+			db.session.commit()
+			return jsonify_message("Password reset successful. You may now log in."), 201
 		return jsonify_message("Invalid request. No user found matching supplied token."), 400
 	except (InvalidTokenHeader, InvalidResetToken, MissingToken, MisusedRegistrationToken):
 		return jsonify_message("Invalid token in reset URL. Please renew your password reset request."), 400

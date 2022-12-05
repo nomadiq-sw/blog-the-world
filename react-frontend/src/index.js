@@ -6,13 +6,21 @@ import {
 } from "react-router-dom";
 import './index.css'
 import App from './App'
+import PasswordResetModal, {loader as tokenLoader} from './components/PasswordResetModal'
 import reportWebVitals from './reportWebVitals'
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css'
 
 const router = createBrowserRouter([
 	{
 		path: "/",
-		element: <App/>
+		element: <App/>,
+		children: [
+			{
+				path: 'reset-password/:token',
+				element: <PasswordResetModal/>,
+				loader: tokenLoader
+			}
+		]
 	}
 ])
 
