@@ -18,7 +18,7 @@ const Sidebar = (props) => {
   })
   const formRef = useRef()
   const emailRef = useRef()
-  const validRef = useRef(false)
+  const validFormRef = useRef(false)
   const {setToken, getToken, removeToken} = useToken()
   const [loggedIn, setLoggedIn] = useState(getToken)
 
@@ -45,16 +45,33 @@ const Sidebar = (props) => {
   const validateForm = (event) => {
     event.preventDefault()
     const form = formRef.current
-    validRef.current = form.checkValidity()
+    validFormRef.current = form.checkValidity()
     form.reportValidity()
   }
 
-  const handleError = (response) => {
-    console.log(response.status)
-    console.log(response.data)
-    setErrorContent(response.data.message)
-    setSuccessShow(false)
-    setErrorShow(true)
+  const validateRecaptcha = () => {
+    if (validFormRef.current) {
+      return (
+        Promise.resolve(
+          () => {
+            return grecaptcha.ready()
+          }
+        ).then(
+          () => {
+            return grecaptcha.execute(process.env.REACT_APP_RECAPTCHA_SITE_KEY, {action: 'submit'})
+          }
+        ).then(
+          (token) => {
+            return axios.get(process.env.REACT_APP_FLASK_API_URL + '/validate-recaptcha/' + token)
+          }
+        ).then(
+          (response) => {
+            return Promise.resolve(response.status === 200)
+          }
+        )
+      )
+    }
+    else { return Promise.resolve(false) }
   }
 
   const clearForm = (event) => {
@@ -65,86 +82,79 @@ const Sidebar = (props) => {
     event.preventDefault()
   }
 
+  const postDataAndTreatResponse = (url, data, successCallback) => {
+    validateRecaptcha().then((recaptchaValid) => {
+      if (validFormRef.current && recaptchaValid) {
+        axios.post(url, data).then((response) => {
+          console.log(response.status)
+          console.log(response.data)
+          successCallback(response)
+        }).catch((error) => {
+          if (error.response) {
+            console.log(error.response.status)
+            console.log(error.response.data)
+            setErrorContent(error.response.data.message)
+            setSuccessShow(false)
+            setErrorShow(true)
+          }
+        })
+      }
+    })
+  }
+
   const logIn = (event) => {
     validateForm(event)
-    if (validRef.current) {
-      axios({
-        method: "POST",
-        url: process.env.REACT_APP_FLASK_API_URL + "/login",
-        data: {
-          email: loginForm.email,
-          password: loginForm.password
-        }
-      }).then((response) => {
-        console.log(response.status)
-        console.log(response.data)
+    postDataAndTreatResponse(
+      process.env.REACT_APP_FLASK_API_URL + "/login",
+      {
+        email: loginForm.email,
+        password: loginForm.password
+      },
+      (response) =>
+      {
         setToken(response.data.access_token)
         if (getToken) {
           setLoggedIn(true)
           handleClose()
         }
-      }).catch((error) => {
-        if (error.response) {
-          handleError(error.response)
-        }
-      })
-      clearForm(event)
-    }
+      }
+    )
+    if (validFormRef.current) { clearForm(event) }
   }
 
   const registerUser = (event) => {
     validateForm(event)
-    if (validRef.current) {
-      axios({
-        method: "POST",
-        url: process.env.REACT_APP_FLASK_API_URL + "/signup",
-        data: {
-          email: loginForm.email,
-          password: loginForm.password
-        }
-      }).then((response) => {
-        console.log(response.status)
-        console.log(response.data)
-        if (response.status === 201) {
-          setSuccessContent(response.data.message)
-          setErrorShow(false)
-          setSuccessShow(true)
-        }
-      }).catch((error) => {
-        if (error.response) {
-          handleError(error.response)
-        }
-      })
-      clearForm(event)
-    }
+    postDataAndTreatResponse(
+      process.env.REACT_APP_FLASK_API_URL + "/signup",
+      {
+        email: loginForm.email,
+        password: loginForm.password
+      },
+      (response) => {
+        setSuccessContent(response.data.message)
+        setErrorShow(false)
+        setSuccessShow(true)
+      }
+    )
+    if (validFormRef.current) { clearForm(event) }
   }
 
   const handleForgottenPassword = (event) => {
     const input = emailRef.current
-    validRef.current = input.checkValidity()
+    validFormRef.current = input.checkValidity()
     input.reportValidity()
-    if (validRef.current) {
-      axios({
-        method: "POST",
-        url: process.env.REACT_APP_FLASK_API_URL + "/forgotten-password",
-        data: {
-          email: loginForm.email
-        }
-      }).then((response) => {
-        console.log(response.status)
-        console.log(response.data)
-        if (response.status === 200) {
-          setSuccessContent(response.data.message)
-          setErrorShow(false)
-          setSuccessShow(true)
-        }
-      }).catch((error) => {
-        if (error.response) {
-          handleError(error.response)
-        }
-      })
-    }
-    clearForm(event)
+    postDataAndTreatResponse(
+      process.env.REACT_APP_FLASK_API_URL + "/forgotten-password",
+      {
+        email: loginForm.email
+      },
+      (response) => {
+        setSuccessContent(response.data.message)
+        setErrorShow(false)
+        setSuccessShow(true)
+      }
+    )
+    if (validFormRef.current) { clearForm(event) }
   }
 
   const handleChange = (event) => {
@@ -197,15 +207,24 @@ const Sidebar = (props) => {
             <div className="container g-0">
               <div className="row justify-content-start g-0">
                 <div className="col-3 pe-2">
-                  <Button type="submit" className="w-100">Log in</Button>
+                  <Button type="submit"
+                          className="g-recaptcha w-100">
+                    Log in
+                  </Button>
                 </div>
                 <div className="col-3 pb-2">
-                  <Button type="button" className="w-100 btn-secondary" onClick={registerUser}>Register</Button>
+                  <Button type="button"
+                          className="g-recaptcha w-100 btn-secondary"
+                          onClick={registerUser}>
+                    Register
+                  </Button>
                 </div>
               </div>
               <div className="row justify-content-start g-0">
                 <div className="col-6">
-                  <Button type="button" className="w-100 btn-light" onClick={handleForgottenPassword}>
+                  <Button type="button"
+                          className="g-recaptcha w-100 btn-light"
+                          onClick={handleForgottenPassword}>
                     <span className="text-black-50">I forgot my password</span>
                   </Button>
                 </div>

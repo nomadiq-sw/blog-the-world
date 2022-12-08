@@ -21,6 +21,13 @@ def jsonify_message(message):
 	return jsonify({'message': message})
 
 
+@api.route("/validate-recaptcha/<token>")
+def validate_recaptcha(token):
+	print("Running dummy recaptcha verification")
+	if token:
+		return jsonify({'token': token}), 200
+
+
 @api.route("/signup", methods=["POST"])
 def signup():
 	req = request.get_json(force=True)

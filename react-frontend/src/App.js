@@ -5,7 +5,7 @@ import Sidebar from './components/Sidebar'
 import {Outlet} from 'react-router-dom'
 import './App.css'
 
-function App() {
+const App = () => {
 	const [posts, setPosts] = useState([])
 
 	useEffect(() => {

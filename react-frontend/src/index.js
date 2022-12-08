@@ -30,12 +30,20 @@ const router = createBrowserRouter([
 	}
 ])
 
+const script = document.createElement('script')
+script.src = `https://www.google.com/recaptcha/api.js?render=${process.env.REACT_APP_RECAPTCHA_SITE_KEY}`
+script.id = 'recaptcha_script'
+document.head.appendChild(script)
+
 const root = ReactDOM.createRoot(document.getElementById('root'))
 
-root.render(
-//  <React.StrictMode>
-	<RouterProvider router={router}/>
-//  </React.StrictMode>
+document.getElementById('recaptcha_script').addEventListener(
+	'load',
+	() => {root.render(
+	//  <React.StrictMode>
+		<RouterProvider router={router}/>
+	//  </React.StrictMode>
+	)}
 )
 
 // If you want to start measuring performance in your app, pass a function

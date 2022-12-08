@@ -40,13 +40,12 @@ const PasswordResetModal = () => {
 		validRef.current = input.checkValidity()
 		input.reportValidity()
 		if (validRef.current) {
-			axios({
-				method: "POST",
-				url: process.env.REACT_APP_FLASK_API_URL + "/reset-password/" + token,
-				data: {
+			axios.post(
+				process.env.REACT_APP_FLASK_API_URL + "/reset-password/" + token,
+				{
 					'new_password': resetForm.password
 				}
-			}).then((response) => {
+			).then((response) => {
         console.log(response.status)
         console.log(response.data)
 				if (response.status === 201) {
