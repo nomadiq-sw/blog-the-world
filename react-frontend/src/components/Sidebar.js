@@ -16,6 +16,7 @@ const Sidebar = (props) => {
     email: "",
     password: ""
   })
+  const [formDisabled, setFormDisabled] = useState(false)
   const formRef = useRef()
   const emailRef = useRef()
   const validFormRef = useRef(false)
@@ -44,6 +45,8 @@ const Sidebar = (props) => {
 
   const validateForm = (event) => {
     event.preventDefault()
+    setErrorShow(false)
+    setSuccessShow(false)
     const form = formRef.current
     validFormRef.current = form.checkValidity()
     form.reportValidity()
@@ -53,21 +56,13 @@ const Sidebar = (props) => {
     if (validFormRef.current) {
       return (
         Promise.resolve(
-          () => {
-            return grecaptcha.ready()
-          }
+          () => grecaptcha.ready()
         ).then(
-          () => {
-            return grecaptcha.execute(process.env.REACT_APP_RECAPTCHA_SITE_KEY, {action: 'submit'})
-          }
+          () => grecaptcha.execute(process.env.REACT_APP_RECAPTCHA_SITE_KEY, {action: 'submit'})
         ).then(
-          (token) => {
-            return axios.get(process.env.REACT_APP_FLASK_API_URL + '/validate-recaptcha/' + token)
-          }
+          (token) => axios.get(process.env.REACT_APP_FLASK_API_URL + '/validate-recaptcha/' + token)
         ).then(
-          (response) => {
-            return Promise.resolve(response.status === 200)
-          }
+          (response) => Promise.resolve(response.status === 200)
         )
       )
     }
@@ -82,9 +77,9 @@ const Sidebar = (props) => {
     event.preventDefault()
   }
 
-  const postDataAndTreatResponse = (url, data, successCallback) => {
-    validateRecaptcha().then((recaptchaValid) => {
-      if (validFormRef.current && recaptchaValid) {
+  const postDataAndTreatResponse = async (url, data, successCallback) => {
+    return validateRecaptcha().then((recaptchaValid) => {
+      if (recaptchaValid) {
         axios.post(url, data).then((response) => {
           console.log(response.status)
           console.log(response.data)
@@ -99,62 +94,88 @@ const Sidebar = (props) => {
           }
         })
       }
-    })
+      else {
+        setErrorContent("Unable to confirm that you are not a robot. Please try again.")
+        setSuccessShow(false)
+        setErrorShow(true)
+      }
+    }).catch(
+      (error) => {
+        console.log(error)
+        setErrorContent("Unable to process recaptcha token. Please try again later.")
+        setSuccessShow(false)
+        setErrorShow(true)
+      }
+    )
   }
 
-  const logIn = (event) => {
+  const logIn = async (event) => {
     validateForm(event)
-    postDataAndTreatResponse(
-      process.env.REACT_APP_FLASK_API_URL + "/login",
-      {
-        email: loginForm.email,
-        password: loginForm.password
-      },
-      (response) =>
-      {
-        setToken(response.data.access_token)
-        if (getToken) {
-          setLoggedIn(true)
-          handleClose()
+    if (validFormRef.current) {
+      setFormDisabled(true)
+      await postDataAndTreatResponse(
+        process.env.REACT_APP_FLASK_API_URL + "/login",
+        {
+          email: loginForm.email,
+          password: loginForm.password
+        },
+        (response) =>
+        {
+          setToken(response.data.access_token)
+          if (getToken) {
+            setLoggedIn(true)
+            handleClose()
+          }
         }
-      }
-    )
-    if (validFormRef.current) { clearForm(event) }
+      )
+      setFormDisabled(false)
+      clearForm(event)
+    }
   }
 
-  const registerUser = (event) => {
+  const registerUser = async (event) => {
     validateForm(event)
-    postDataAndTreatResponse(
-      process.env.REACT_APP_FLASK_API_URL + "/signup",
-      {
-        email: loginForm.email,
-        password: loginForm.password
-      },
-      (response) => {
-        setSuccessContent(response.data.message)
-        setErrorShow(false)
-        setSuccessShow(true)
-      }
-    )
-    if (validFormRef.current) { clearForm(event) }
+    if (validFormRef.current) {
+      setFormDisabled(true)
+      console.log("Disabled form")
+      await postDataAndTreatResponse(
+        process.env.REACT_APP_FLASK_API_URL + "/signup",
+        {
+          email: loginForm.email,
+          password: loginForm.password
+        },
+        (response) => {
+          setSuccessContent(response.data.message)
+          setErrorShow(false)
+          setSuccessShow(true)
+        }
+      )
+      setFormDisabled(false)
+      console.log("Enabled form")
+      clearForm(event)
+    }
   }
 
-  const handleForgottenPassword = (event) => {
+  const handleForgottenPassword = async (event) => {
     const input = emailRef.current
     validFormRef.current = input.checkValidity()
     input.reportValidity()
-    postDataAndTreatResponse(
-      process.env.REACT_APP_FLASK_API_URL + "/forgotten-password",
-      {
-        email: loginForm.email
-      },
-      (response) => {
-        setSuccessContent(response.data.message)
-        setErrorShow(false)
-        setSuccessShow(true)
-      }
-    )
-    if (validFormRef.current) { clearForm(event) }
+    if (validFormRef.current) {
+      setFormDisabled(true)
+      await postDataAndTreatResponse(
+        process.env.REACT_APP_FLASK_API_URL + "/forgotten-password",
+        {
+          email: loginForm.email
+        },
+        (response) => {
+          setSuccessContent(response.data.message)
+          setErrorShow(false)
+          setSuccessShow(true)
+        }
+      )
+      setFormDisabled(false)
+      clearForm(event)
+    }
   }
 
   const handleChange = (event) => {
@@ -184,6 +205,7 @@ const Sidebar = (props) => {
             <Form.Group className="mb-2">
               <Form.Label>E-mail address</Form.Label>
               <Form.Control onChange={handleChange}
+                            disabled={formDisabled}
                             ref={emailRef}
                             required
                             type="email"
@@ -194,6 +216,7 @@ const Sidebar = (props) => {
             <Form.Group className="mb-2">
               <Form.Label>Password</Form.Label>
               <Form.Control onChange={handleChange}
+                            disabled={formDisabled}
                             required
                             minLength="8"
                             type="password"
@@ -208,12 +231,14 @@ const Sidebar = (props) => {
               <div className="row justify-content-start g-0">
                 <div className="col-3 pe-2">
                   <Button type="submit"
+                          disabled={formDisabled}
                           className="g-recaptcha w-100">
                     Log in
                   </Button>
                 </div>
                 <div className="col-3 pb-2">
                   <Button type="button"
+                          disabled={formDisabled}
                           className="g-recaptcha w-100 btn-secondary"
                           onClick={registerUser}>
                     Register
@@ -223,6 +248,7 @@ const Sidebar = (props) => {
               <div className="row justify-content-start g-0">
                 <div className="col-6">
                   <Button type="button"
+                          disabled={formDisabled}
                           className="g-recaptcha w-100 btn-light"
                           onClick={handleForgottenPassword}>
                     <span className="text-black-50">I forgot my password</span>
