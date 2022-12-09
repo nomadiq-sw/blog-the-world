@@ -62,7 +62,7 @@ const Sidebar = (props) => {
         ).then(
           (token) => axios.get(process.env.REACT_APP_FLASK_API_URL + '/validate-recaptcha/' + token)
         ).then(
-          (response) => Promise.resolve(response.status === 200)
+          (response) => Promise.resolve(response.status === 204)
         )
       )
     }

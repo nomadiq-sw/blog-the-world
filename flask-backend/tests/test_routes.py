@@ -128,3 +128,8 @@ def test_password_reset_invalid_token(client, user, guard):
 	)
 	assert response.status_code == 400
 	assert b"Invalid token in reset URL." in response.data
+
+
+def test_dummy_recaptcha_validation(client):
+	response = client.get('/validate-recaptcha/1234')
+	assert response.status_code == 204

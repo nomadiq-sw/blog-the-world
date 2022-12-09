@@ -1,4 +1,5 @@
 import json
+import requests
 from flask import jsonify, make_response, request, render_template, current_app, Blueprint
 from .models import Languages, TravelerTypes, TripTypes, User, Post, db
 from flask_cors import CORS
@@ -23,9 +24,21 @@ def jsonify_message(message):
 
 @api.route("/validate-recaptcha/<token>")
 def validate_recaptcha(token):
-	print("Running dummy recaptcha verification")
-	if token:
-		return jsonify({'token': token}), 200
+	if current_app.config.get('TESTING'):
+		return '', 204
+	else:
+		response = requests.post(
+			"https://www.google.com/recaptcha/api/siteverify",
+			data={
+				'secret': current_app.config.get('RECAPTCHA_SECRET_KEY'),
+				'response': token
+			}
+		)
+		data = response.json()
+		if 'success' in data and data['success']:
+			return '', 204
+		else:
+			return jsonify_message("reCAPTCHA validation failed"), 403
 
 
 @api.route("/signup", methods=["POST"])
