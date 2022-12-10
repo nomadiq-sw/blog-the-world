@@ -2,17 +2,24 @@ import { useState, useEffect, useCallback } from 'react'
 import GoogleMapReact from 'google-map-react'
 import Marker from './Marker'
 import NewPostMenu from './NewPostMenu'
+import marker from "./Marker";
 
 const SimpleMap = (props) => {
 	const [center, setCenter] = useState({lat: 20.0, lng: 10.0 })
 	const [zoom, setZoom] = useState(2.5)
 	const [menuState, setMenuState] = useState(false)
+	const [menuEditPost, setMenuEditPost] = useState(0)
 	const [menuPosition, setMenuPosition] = useState({lat: 20.0, lng: 10.0})
 
 	const handleGoogleApiLoaded = (map, maps) => {
 	  maps.event.addListener(map, "contextmenu", function(ev) {
 		  let latitude = ev.latLng.lat()
 		  let longitude = ev.latLng.lng()
+		  let elements = document.querySelectorAll(':hover')
+		  let last = elements.item(elements.length-1)
+		  let regex = /sc-bczRLJ iQVEig marker(\d+)/g
+		  let match = regex.exec(last.className)
+		  setMenuEditPost(match ? parseInt(match[1]) : 0)
 		  setMenuPosition({lat: latitude, lng: longitude})
 			setMenuState(true)
 	  })
@@ -34,7 +41,7 @@ const SimpleMap = (props) => {
 			onChange = {({center, zoom, bounds, ...other}) => {setMenuState(false)}}
 			onClick={() => {setMenuState(false)}}
 		>
-			<NewPostMenu state={menuState} lat={menuPosition.lat} lng={menuPosition.lng}/>
+			<NewPostMenu state={menuState} edit={menuEditPost} lat={menuPosition.lat} lng={menuPosition.lng}/>
 			{props.pins.map((post) => (
 				<Marker
 					key={post.id}
