@@ -1,4 +1,3 @@
-import {useState} from 'react'
 import {ControlledMenu, MenuItem} from '@szhsin/react-menu'
 import {useMenuState} from '@szhsin/react-menu'
 import '@szhsin/react-menu/dist/core.css'
@@ -25,22 +24,17 @@ const Menu = styled(ControlledMenu)`
   }
 `
 
-const NewPostMenu = ({state, edit}) => {
+const NewPostMenu = ({state, edit, handleMenuClick}) => {
   const [menuProps, toggleMenu] = useMenuState()
-
 	const authTokenIsAbsent = () => localStorage.getItem('token') === null
-
-	const openNewPostModal = () => {
-		console.log("Clicked!")
-		toggleMenu(false)
-		return null
-	}
 
 	toggleMenu(state)
 
 	return (
     <Menu {...menuProps} aria-label='Add or edit a post' onClose={() => toggleMenu(false)}>
-	    <MenuItem disabled={authTokenIsAbsent()} onClick={openNewPostModal} aria-label={edit ? 'Edit post' : 'Add post'}>
+	    <MenuItem disabled={authTokenIsAbsent()}
+	              onClick={() => {handleMenuClick(); toggleMenu(false)}}
+	              aria-label={edit ? 'Edit post' : 'Add post'}>
 		    {edit ? 'Edit' : 'Add'} post
 			</MenuItem>
     </Menu>

@@ -13,8 +13,8 @@ const ConfirmSignupModal = () => {
 	const [show, setShow] = useState(true)
 	const [errorShow, setErrorShow] = useState(false)
 	const [errorContent, setErrorContent] = useState("")
-	const [successContent, setSuccessContent] = useState("")
 	const [successShow, setSuccessShow] = useState(false)
+	const [successContent, setSuccessContent] = useState("")
 	const token = useLoaderData()
 	const navigate = useNavigate()
 

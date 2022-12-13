@@ -1,6 +1,8 @@
-import json
+import sys
 import requests
+import logging
 from flask import jsonify, make_response, request, render_template, current_app, Blueprint
+from sqlalchemy.exc import NoResultFound
 from .models import Languages, TravelerTypes, TripTypes, User, Post, db
 from flask_cors import CORS
 from flask_praetorian import auth_required, roles_required, Praetorian
@@ -17,6 +19,7 @@ api = Blueprint('api', __name__)
 guard = Praetorian()
 cors = CORS()
 
+logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
 def jsonify_message(message):
 	return jsonify({'message': message})
@@ -136,13 +139,23 @@ def reset_password(token):
 
 
 @api.route("/posts")
-def posts():
-	all_posts = db.session.execute(db.select(Post)).all()
-	post_list = []
-	for post in all_posts:
-		post_list.append(post[0].to_dict())
-	response = make_response(post_list)  # N.B. DO NOT JSONIFY: Flask does it automatically
-	return response, 200
+@api.route("/posts/<slug>")
+def posts(slug=None):
+	if slug is None:
+		all_posts = db.session.execute(db.select(Post)).all()
+		post_list = []
+		for post in all_posts:
+			post_list.append(post[0].to_dict())
+		response = make_response(post_list), 200  # N.B. DO NOT JSONIFY: Flask does it automatically
+	else:
+		try:
+			post = db.session.execute(db.select(Post).filter_by(id=slug)).one()
+			post_dict = post._asdict()  # Ignore warning about access to protected member, this is the NamedTuple API
+			response = make_response(post_dict['Post'].to_dict()), 200
+		except NoResultFound:
+			logging.warning(f"Attempted to read post record with id {slug}")
+			response = '', 404
+	return response
 
 
 @api.route("/add-post", methods=['POST'])

@@ -1,8 +1,8 @@
-import { useState, useEffect, useCallback } from 'react'
+import {useState} from 'react'
 import GoogleMapReact from 'google-map-react'
 import Marker from './Marker'
 import NewPostMenu from './NewPostMenu'
-import marker from "./Marker";
+import NewPostModal from './NewPostModal'
 
 const SimpleMap = (props) => {
 	const [center, setCenter] = useState({lat: 20.0, lng: 10.0 })
@@ -10,6 +10,7 @@ const SimpleMap = (props) => {
 	const [menuState, setMenuState] = useState(false)
 	const [menuEditPost, setMenuEditPost] = useState(0)
 	const [menuPosition, setMenuPosition] = useState({lat: 20.0, lng: 10.0})
+	const [modalShow, setModalShow] = useState(0)
 
 	const handleGoogleApiLoaded = (map, maps) => {
 	  maps.event.addListener(map, "contextmenu", function(ev) {
@@ -23,6 +24,10 @@ const SimpleMap = (props) => {
 		  setMenuPosition({lat: latitude, lng: longitude})
 			setMenuState(true)
 	  })
+	}
+
+	const handleNewPostMenuClick = () => {
+		setModalShow(modalShow + 1)
 	}
 
 	return (
@@ -39,9 +44,13 @@ const SimpleMap = (props) => {
 			yesIWantToUseGoogleMapApiInternals
 			onGoogleApiLoaded={({map, maps}) => handleGoogleApiLoaded(map, maps)}
 			onChange = {({center, zoom, bounds, ...other}) => {setMenuState(false)}}
-			onClick={() => {setMenuState(false)}}
-		>
-			<NewPostMenu state={menuState} edit={menuEditPost} lat={menuPosition.lat} lng={menuPosition.lng}/>
+			onClick={() => {setMenuState(false)}}>
+			<NewPostMenu state={menuState}
+			             edit={menuEditPost}
+			             handleMenuClick={handleNewPostMenuClick}
+			             lat={menuPosition.lat}
+			             lng={menuPosition.lng}/>
+			<NewPostModal modalShow={modalShow} postId={menuEditPost}/>
 			{props.pins.map((post) => (
 				<Marker
 					key={post.id}
