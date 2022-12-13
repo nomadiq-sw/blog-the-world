@@ -40,6 +40,14 @@ const SimpleMap = (props) => {
 				minZoomOverride: true,
 				minZoom: 2.5,
 				fullscreenControl: false,
+				restriction: {
+					latLngBounds: {
+						north: 85,
+						south: -85,
+						west: -180,
+						east: 180
+					}
+				},
 			}}
 			yesIWantToUseGoogleMapApiInternals
 			onGoogleApiLoaded={({map, maps}) => handleGoogleApiLoaded(map, maps)}
