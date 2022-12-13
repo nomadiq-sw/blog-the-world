@@ -21,6 +21,7 @@ cors = CORS()
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
+
 def jsonify_message(message):
 	return jsonify({'message': message})
 
@@ -150,8 +151,9 @@ def posts(slug=None):
 	else:
 		try:
 			post = db.session.execute(db.select(Post).filter_by(id=slug)).one()
-			post_dict = post._asdict()  # Ignore warning about access to protected member, this is the NamedTuple API
-			response = make_response(post_dict['Post'].to_dict()), 200
+			# Ignore warning about access to protected member, this is from the NamedTuple API:
+			post_dict = post._asdict()['Post'].to_dict()
+			response = make_response(post_dict), 200
 		except NoResultFound:
 			logging.warning(f"Attempted to read post record with id {slug}")
 			response = '', 404

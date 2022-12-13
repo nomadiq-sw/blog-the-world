@@ -10,6 +10,19 @@ def test_get_posts(app, dbx, client, post_details, post):
 	assert resp_dict['title'] == post_details['title']
 
 
+def test_get_single_post(app, dbx, client, post_details, post):
+	response = client.get('/posts/1')
+	assert response.status_code == 200
+	resp_dict = json.loads(response.data.decode('utf-8'))
+	assert resp_dict['title'] == post_details['title']
+
+
+def test_get_single_post_invalid_id(app, dbx, client, post):
+	response = client.get('/posts/0')
+	assert response.status_code == 404
+	assert response.data.decode('utf-8') == ''
+
+
 def test_signup_success(app, dbx, client, user_details, outbox):
 	response = client.post(
 		'/signup',
