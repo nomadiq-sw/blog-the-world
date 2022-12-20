@@ -62,7 +62,7 @@ def test_signup_confirmation_valid(app, dbx, client, guard, user_details):
 
 
 def test_signup_confirmation_invalid_token(app, dbx, client, guard, user_details):
-	response = client.post(
+	client.post(
 		'/signup',
 		json={"email": user_details['email'], "password": user_details['password']}
 	)

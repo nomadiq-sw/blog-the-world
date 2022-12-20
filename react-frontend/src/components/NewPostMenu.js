@@ -30,6 +30,7 @@ const NewPostMenu = ({state, edit, handleMenuClick}) => {
 
 	toggleMenu(state)
 
+	// noinspection JSValidateTypes
 	return (
     <Menu {...menuProps} aria-label='Add or edit a post' onClose={() => toggleMenu(false)}>
 	    <MenuItem disabled={authTokenIsAbsent()}

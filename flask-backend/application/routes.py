@@ -91,8 +91,8 @@ def login():
 	Logs a user in by parsing a POST request containing user credentials and
 	issuing a JWT token.
 	.. example::
-	   $ curl http://localhost:5000/login -X POST \
-		 -d '{"email":"juan.gomez@realtalk.com","password":"HappyGoLucky"}'
+		$ curl http://localhost:5000/login -X POST \
+			-d '{"email":"juan.gomez@realtalk.com","password":"HappyGoLucky"}'
 	"""
 	req = request.get_json(force=True)
 	email = req.get("email", None)
