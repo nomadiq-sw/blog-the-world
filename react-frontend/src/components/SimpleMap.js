@@ -58,7 +58,7 @@ const SimpleMap = (props) => {
 			             handleMenuClick={handleNewPostMenuClick}
 			             lat={menuPosition.lat}
 			             lng={menuPosition.lng}/>
-			<NewPostModal modalShow={modalShow} postId={menuEditPost}/>
+			<NewPostModal modalShow={modalShow} postId={menuEditPost} initLat={menuPosition.lat} initLng={menuPosition.lng}/>
 			{props.pins.map((post) => (
 				<Marker
 					key={post.id}
