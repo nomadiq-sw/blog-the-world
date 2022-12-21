@@ -1,7 +1,7 @@
 import axios from 'axios'
 import {useEffect, useState} from 'react'
 import SimpleMap from './components/SimpleMap'
-import Sidebar from './components/Sidebar'
+import LoginSidebar from './components/LoginSidebar'
 import {Outlet} from 'react-router-dom'
 import './App.css'
 
@@ -26,7 +26,7 @@ const App = () => {
 		<div className='App'>
 			<header className='App-header'>
 				<h1 style={{fontSize:36, paddingLeft:'8px', color:'white'}}>#BTW</h1>
-				<Sidebar placement='end'/>
+				<LoginSidebar placement='end'/>
 			</header>
 			<div className='map-container' style={{ height: '94vh', width: '100%' }}>
 				<Outlet/>

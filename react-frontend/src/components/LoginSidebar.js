@@ -6,7 +6,7 @@ import Form from 'react-bootstrap/Form'
 import Offcanvas from 'react-bootstrap/Offcanvas'
 import axios from 'axios'
 
-const Sidebar = (props) => {
+const LoginSidebar = (props) => {
   const [show, setShow] = useState(false)
   const [errorShow, setErrorShow] = useState(false)
   const [errorContent, setErrorContent] = useState("")
@@ -263,4 +263,4 @@ const Sidebar = (props) => {
   )
 }
 
-export default Sidebar
+export default LoginSidebar

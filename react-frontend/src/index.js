@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client'
 import {
 	createBrowserRouter,
 	RouterProvider,
-} from "react-router-dom";
+} from 'react-router-dom'
 import './index.css'
 import App from './App'
 import PasswordResetModal, {loader as resetTokenLoader} from './components/PasswordResetModal'
@@ -31,7 +31,8 @@ const router = createBrowserRouter([
 ])
 
 const script = document.createElement('script')
-script.src = `https://www.google.com/recaptcha/api.js?badge=bottomleft&render=${process.env.REACT_APP_RECAPTCHA_SITE_KEY}`
+script.src =
+	`https://www.google.com/recaptcha/api.js?badge=bottomleft&render=${process.env.REACT_APP_RECAPTCHA_SITE_KEY}`
 script.id = 'recaptcha_script'
 document.head.appendChild(script)
 
