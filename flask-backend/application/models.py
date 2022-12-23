@@ -26,10 +26,10 @@ class Languages(str, enum.Enum):
 
 
 class TravelerTypes(str, enum.Enum):
-	Solo = 'Solo'
 	Couple = 'Couple'
 	Family = 'Family'
 	Group = 'Group'
+	Solo = 'Solo'
 
 
 class TripTypes(str, enum.Enum):
@@ -37,11 +37,13 @@ class TripTypes(str, enum.Enum):
 	Business = 'Business trip'
 	Camping = 'Camping'
 	Caravan = 'Camper/caravan'
+	Cruise = 'Cruise'
 	Cycling = 'Cycling'
 	Hiking = 'Hiking'
 	Mini = 'Mini-break'
 	Package = 'Package holiday'
 	Roadtrip = 'Roadtrip'
+	Volunteer = 'Volunteering'
 
 
 class User(db.Model):
