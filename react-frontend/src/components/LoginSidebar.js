@@ -1,9 +1,17 @@
 import React, {useState, useRef} from 'react'
 import useToken from './useToken'
-import Alert from 'react-bootstrap/Alert'
-import Button from 'react-bootstrap/Button'
-import Form from 'react-bootstrap/Form'
-import Offcanvas from 'react-bootstrap/Offcanvas'
+import {
+  Alert,
+  Button,
+  Form,
+  FormGroup,
+  FormLabel,
+  FormControl,
+  Offcanvas,
+  OffcanvasHeader,
+  OffcanvasTitle,
+  OffcanvasBody,
+} from 'react-bootstrap'
 import axios from 'axios'
 
 const LoginSidebar = (props) => {
@@ -191,10 +199,10 @@ const LoginSidebar = (props) => {
         {loggedIn? 'Log out' : 'Log in'}
       </Button>
       <Offcanvas show={show} onHide={handleClose} {...props}>
-        <Offcanvas.Header closeButton>
-          <Offcanvas.Title>Log in or Register</Offcanvas.Title>
-        </Offcanvas.Header>
-        <Offcanvas.Body>
+        <OffcanvasHeader closeButton>
+          <OffcanvasTitle>Log in or Register</OffcanvasTitle>
+        </OffcanvasHeader>
+        <OffcanvasBody>
           <Alert show={errorShow} variant='danger'>
             {errorContent}
           </Alert>
@@ -202,28 +210,28 @@ const LoginSidebar = (props) => {
             {successContent}
           </Alert>
           <Form ref={formRef} onSubmit={logIn}>
-            <Form.Group className="mb-2">
-              <Form.Label>E-mail address</Form.Label>
-              <Form.Control onChange={handleChange}
-                            disabled={formDisabled}
-                            ref={emailRef}
-                            required
-                            type="email"
-                            name="email"
-                            placeholder="E-mail"
-                            value={loginForm.email}/>
-            </Form.Group>
-            <Form.Group className="mb-2">
-              <Form.Label>Password</Form.Label>
-              <Form.Control onChange={handleChange}
-                            disabled={formDisabled}
-                            required
-                            minLength="8"
-                            type="password"
-                            name="password"
-                            placeholder="Password"
-                            value={loginForm.password}/>
-            </Form.Group>
+            <FormGroup className="mb-2" controlId='formGroupEmail'>
+              <FormLabel>E-mail address</FormLabel>
+              <FormControl onChange={handleChange}
+                           disabled={formDisabled}
+                           ref={emailRef}
+                           required
+                           type="email"
+                           name="email"
+                           placeholder="E-mail"
+                           value={loginForm.email}/>
+            </FormGroup>
+            <FormGroup className="mb-2" controlId='formGroupPassword'>
+              <FormLabel>Password</FormLabel>
+              <FormControl onChange={handleChange}
+                           disabled={formDisabled}
+                           required
+                           minLength="8"
+                           type="password"
+                           name="password"
+                           placeholder="Password"
+                           value={loginForm.password}/>
+            </FormGroup>
             <span className="text-black-50">
               By registering, you accept the terms & conditions and privacy policy.
             </span><br className="mb-2"/>
@@ -257,7 +265,7 @@ const LoginSidebar = (props) => {
               </div>
             </div>
           </Form>
-        </Offcanvas.Body>
+        </OffcanvasBody>
       </Offcanvas>
     </div>
   )

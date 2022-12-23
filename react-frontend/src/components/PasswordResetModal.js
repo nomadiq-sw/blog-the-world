@@ -1,8 +1,16 @@
 import React, {useState, useRef} from 'react'
-import Alert from 'react-bootstrap/Alert'
-import Button from 'react-bootstrap/Button'
-import Form from 'react-bootstrap/Form'
-import Modal from 'react-bootstrap/Modal'
+import {
+	Alert,
+	Button,
+	Form,
+	FormGroup,
+	FormLabel,
+	FormControl,
+	Modal,
+	ModalHeader,
+	ModalTitle,
+	ModalBody,
+} from 'react-bootstrap'
 import axios from 'axios'
 import {useLoaderData, useNavigate} from 'react-router-dom'
 
@@ -77,10 +85,10 @@ const PasswordResetModal = () => {
 
 	return (
 		<Modal show={show} onHide={handleClose}>
-			<Modal.Header closeButton>
-				<Modal.Title>Choose a new password</Modal.Title>
-			</Modal.Header>
-			<Modal.Body>
+			<ModalHeader closeButton>
+				<ModalTitle>Choose a new password</ModalTitle>
+			</ModalHeader>
+			<ModalBody>
         <Alert show={errorShow} variant='danger'>
           {errorContent}
         </Alert>
@@ -88,22 +96,22 @@ const PasswordResetModal = () => {
           {successContent}
         </Alert>
 				<Form onSubmit={handlePasswordReset}>
-					<Form.Group>
-						<Form.Label>
+					<FormGroup controlId='formControlNewPassword'>
+						<FormLabel>
 							New password
-						</Form.Label>
-						<Form.Control onChange={handleChange}
-						              ref={passwordRef}
-						              required
-						              minLength="8"
-						              type="password"
-						              name="password"
-						              placeholder="Password"
-						              value={resetForm.password}/>
-					</Form.Group>
+						</FormLabel>
+						<FormControl onChange={handleChange}
+						             ref={passwordRef}
+						             required
+						             minLength="8"
+						             type="password"
+						             name="password"
+						             placeholder="Password"
+						             value={resetForm.password}/>
+					</FormGroup>
 					<Button className="mt-3" type="submit">Submit</Button>
 				</Form>
-			</Modal.Body>
+			</ModalBody>
 		</Modal>
 	)
 }

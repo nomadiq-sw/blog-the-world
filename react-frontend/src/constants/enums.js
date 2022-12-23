@@ -13,12 +13,26 @@ export const Language = {
 	RU: 'Russian',
 	TR: 'Turkish',
 	VI: 'Vietnamese',
-	ZH: 'Chinese'
+	ZH: 'Chinese',
 }
 
 export const Traveler = {
-	Solo: 'Solo',
 	Couple: 'Couple',
 	Family: 'Family',
-	Group: 'Group'
+	Group: 'Group',
+	Solo: 'Solo',
+}
+
+export const Trip = {
+	Backpack: 'Backpacking',
+	Business: 'Business trip',
+	Camping: 'Camping',
+	Caravan: 'Camper/caravan',
+	Cruise: 'Cruise',
+	Cycling: 'Cycling',
+	Hiking: 'Hiking',
+	Mini: 'Mini-break',
+	Package: 'Package holiday',
+	Roadtrip: 'Roadtrip',
+	Volunteer: 'Volunteering',
 }

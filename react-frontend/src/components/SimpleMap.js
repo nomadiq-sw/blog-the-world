@@ -14,8 +14,8 @@ const SimpleMap = (props) => {
 
 	const handleGoogleApiLoaded = (map, maps) => {
 	  maps.event.addListener(map, "contextmenu", function(ev) {
-		  let latitude = ev.latLng.lat()
-		  let longitude = ev.latLng.lng()
+		  let latitude = parseFloat(ev.latLng.lat().toFixed(5))
+		  let longitude = parseFloat(ev.latLng.lng().toFixed(5))
 		  let elements = document.querySelectorAll(':hover')
 		  let last = elements.item(elements.length-1)
 		  let regex = /sc-bczRLJ iQVEig marker(\d+)/g

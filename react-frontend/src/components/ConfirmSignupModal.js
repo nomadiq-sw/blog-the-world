@@ -1,7 +1,10 @@
 import React, {useState, useEffect} from 'react'
-import Alert from 'react-bootstrap/Alert'
-import Button from 'react-bootstrap/Button'
-import Modal from 'react-bootstrap/Modal'
+import {
+	Alert,
+	Button,
+	Modal,
+	ModalBody,
+} from 'react-bootstrap'
 import axios from 'axios'
 import {useLoaderData, useNavigate} from 'react-router-dom'
 
@@ -51,7 +54,7 @@ const ConfirmSignupModal = () => {
 
 	return (
 		<Modal show={show} onHide={handleClose}>
-			<Modal.Body>
+			<ModalBody>
 				<Alert show={errorShow} variant='danger'>
 					{errorContent}
 				</Alert>
@@ -59,7 +62,7 @@ const ConfirmSignupModal = () => {
 					{successContent}
 				</Alert>
 				<Button type="button" onClick={handleClose}>OK</Button>
-			</Modal.Body>
+			</ModalBody>
 		</Modal>
 	)
 }
