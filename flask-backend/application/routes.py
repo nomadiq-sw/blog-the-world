@@ -181,7 +181,8 @@ def posts(
 @api.route("/add-post", methods=['POST'])
 @auth_required
 def add_post():
-	pass
+	logging.info("Accepted POST request to add-post endpoint")
+	return '', 200
 
 
 @api.route("/delete-post/<slug>", methods=["POST"])

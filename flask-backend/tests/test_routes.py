@@ -97,10 +97,11 @@ def test_signup_confirmation_valid(app, dbx, client, guard, user_details):
 
 
 def test_signup_confirmation_invalid_token(app, dbx, client, guard, user_details):
-	client.post(
+	signup_response = client.post(
 		'/signup',
 		json={"email": user_details['email'], "password": user_details['password']}
 	)
+	assert signup_response.status_code == 201
 	new_user = User.lookup(user_details['email'])
 	token = guard.encode_jwt_token(new_user, bypass_user_check=True, is_reset_token=True)
 	response = client.get(
@@ -181,3 +182,14 @@ def test_password_reset_invalid_token(client, user, guard):
 def test_dummy_recaptcha_validation(client):
 	response = client.get('/validate-recaptcha/1234')
 	assert response.status_code == 204
+
+
+def test_add_post_unauthenticated_user(client, user):
+	response = client.post('/add-post', data={})
+	assert response.status_code == 401
+
+
+def test_add_post_authenticated_user(client, guard, user):
+	token = guard.encode_jwt_token(user)
+	response = client.post('/add-post', headers={"Authorization": f"Bearer {token}"}, data={})
+	assert response.status_code == 200
