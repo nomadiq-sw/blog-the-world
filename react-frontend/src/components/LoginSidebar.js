@@ -1,5 +1,4 @@
 import React, {useState, useRef} from 'react'
-import useToken from './useToken'
 import {
   Alert,
   Button,
@@ -13,6 +12,8 @@ import {
   OffcanvasBody,
 } from 'react-bootstrap'
 import axios from 'axios'
+import useToken from '../utilities/useToken'
+import validateRecaptcha from '../utilities/validateRecaptcha'
 
 const LoginSidebar = (props) => {
   const [show, setShow] = useState(false)
@@ -60,23 +61,6 @@ const LoginSidebar = (props) => {
     form.reportValidity()
   }
 
-  const validateRecaptcha = () => {
-    if (validFormRef.current) {
-      return (
-        Promise.resolve(
-          () => grecaptcha.ready()
-        ).then(
-          () => grecaptcha.execute(process.env.REACT_APP_RECAPTCHA_SITE_KEY, {action: 'submit'})
-        ).then(
-          (token) => axios.get(process.env.REACT_APP_FLASK_API_URL + '/validate-recaptcha/' + token)
-        ).then(
-          (response) => Promise.resolve(response.status === 204)
-        )
-      )
-    }
-    else { return Promise.resolve(false) }
-  }
-
   const clearForm = (event) => {
     setLoginForm(({
       email: loginForm.email,
@@ -86,7 +70,7 @@ const LoginSidebar = (props) => {
   }
 
   const postDataAndTreatResponse = async (url, data, successCallback) => {
-    return validateRecaptcha().then((recaptchaValid) => {
+    return validateRecaptcha(validFormRef).then((recaptchaValid) => {
       if (recaptchaValid) {
         axios.post(url, data).then((response) => {
           console.log(response.status)

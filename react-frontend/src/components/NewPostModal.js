@@ -16,7 +16,9 @@ import {
 	ModalBody,
 } from 'react-bootstrap'
 import axios from 'axios'
-import {Language, Traveler, Trip} from '../constants/enums'
+import {Language, Traveler, Trip} from '../utilities/enums'
+import useToken from '../utilities/useToken'
+import validateRecaptcha from '../utilities/validateRecaptcha'
 
 const NewPostModal = ({modalShow, postId, initLat, initLng}) => {
 	const [show, setShow] = useState(false)
