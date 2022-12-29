@@ -112,7 +112,7 @@ class User(db.Model):
 
 class Post(db.Model, SerializerMixin):
 	__tablename__ = "posts"
-	serialize_only = ('id', 'title', 'url', 'language', 'date', 'traveler', 'trip', 'latitude', 'longitude')
+	serialize_only = ('id', 'title', 'url', 'language', 'date', 'traveler', 'trip', 'latitude', 'longitude', 'verified')
 
 	id = db.Column(db.Integer, primary_key=True)
 	title = db.Column(db.String(180), nullable=False)

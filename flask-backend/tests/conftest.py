@@ -1,5 +1,4 @@
 import datetime
-
 import pytest
 from application import create_app
 from application.models import db, User, Post, Languages, TravelerTypes, TripTypes
@@ -60,7 +59,7 @@ def user(app, dbx, guard, user_details):
 	)
 	dbx.session.add(test_user)
 	dbx.session.commit()
-	user = dbx.session.query(User).get(1)
+	user = dbx.session.execute(dbx.select(User).filter_by(email=user_details['email'])).one()[0]
 	return user
 
 
@@ -74,6 +73,7 @@ def post_details():
 	trip = {TripTypes.Camping, TripTypes.Roadtrip}
 	latitude = 37.26801
 	longitude = -90.20220
+	verified = True
 	return {
 		'title': title,
 		'language': language,
@@ -82,7 +82,8 @@ def post_details():
 		'traveler': traveler,
 		'trip': trip,
 		'latitude': latitude,
-		'longitude': longitude
+		'longitude': longitude,
+		'verified': verified
 	}
 
 
@@ -97,9 +98,52 @@ def post(app, dbx, user, post_details):
 		trip=post_details['trip'],
 		latitude=post_details['latitude'],
 		longitude=post_details['longitude'],
+		verified=post_details['verified'],
 		user=user.id
 	)
 	dbx.session.add(new_post)
 	dbx.session.commit()
-	post = dbx.session.query(Post).get(1)
+	post = dbx.session.execute(dbx.select(Post).filter_by(title=post_details['title'])).one()
+	return post
+
+
+@pytest.fixture()
+def expired_post(app, dbx, user, post_details):
+	exp_title = "An expired blog post"
+	exp_post = Post(
+		title=exp_title,
+		url=post_details['url'],
+		language=post_details['language'],
+		date=datetime.date.today()-datetime.timedelta(days=730),
+		traveler=post_details['traveler'],
+		trip=post_details['trip'],
+		latitude=post_details['latitude'],
+		longitude=post_details['longitude'],
+		verified=post_details['verified'],
+		user=user.id
+	)
+	dbx.session.add(exp_post)
+	dbx.session.commit()
+	post = dbx.session.execute(dbx.select(Post).filter_by(title=exp_title)).one()
+	return post
+
+
+@pytest.fixture()
+def unverified_post(app, dbx, user, post_details):
+	unv_title = "An unverified blog post"
+	unv_post = Post(
+		title=unv_title,
+		url=post_details['url'],
+		language=post_details['language'],
+		date=post_details['date'],
+		traveler=post_details['traveler'],
+		trip=post_details['trip'],
+		latitude=post_details['latitude'],
+		longitude=post_details['longitude'],
+		verified=False,
+		user=user.id
+	)
+	dbx.session.add(unv_post)
+	dbx.session.commit()
+	post = dbx.session.execute(dbx.select(Post).filter_by(title=unv_title)).one()
 	return post

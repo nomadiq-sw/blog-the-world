@@ -10,6 +10,28 @@ def test_get_posts(app, dbx, client, post_details, post):
 	assert resp_dict['title'] == post_details['title']
 
 
+def test_get_posts_including_unverified(app, dbx, client, post_details, post, unverified_post):
+	response = client.get('/posts')
+	assert response.status_code == 200
+	resp_list = json.loads(response.data.decode('utf-8'))
+	assert len(resp_list) == 2
+	assert {resp_list[0]['title'], resp_list[1]['title']} == {post_details['title'], "An unverified blog post"}
+	resp_verified = [resp for resp in resp_list if resp['verified'] is True]
+	resp_unverified = [resp for resp in resp_list if resp['verified'] is False]
+	assert len(resp_verified) == 1
+	assert len(resp_unverified) == 1
+	assert resp_verified[0]['title'] == post_details['title']
+	assert resp_unverified[0]['title'] == "An unverified blog post"
+
+
+def test_get_posts_excluding_expired(app, dbx, client, post_details, post, expired_post):
+	response = client.get('/posts')
+	assert response.status_code == 200
+	resp_list = json.loads(response.data.decode('utf-8'))
+	assert len(resp_list) == 1
+	assert resp_list[0]['title'] == post_details['title']
+
+
 def test_get_single_post(app, dbx, client, post_details, post):
 	response = client.get('/posts/1')
 	assert response.status_code == 200
@@ -21,6 +43,19 @@ def test_get_single_post_invalid_id(app, dbx, client, post):
 	response = client.get('/posts/0')
 	assert response.status_code == 404
 	assert response.data.decode('utf-8') == ''
+
+
+def test_get_single_post_expired(app, dbx, client, expired_post):
+	response = client.get('/posts/1')
+	assert response.status_code == 404
+	assert response.data.decode('utf-8') == ''
+
+
+def test_get_single_post_unverified(app, dbx, client, unverified_post):
+	response = client.get('/posts/1')
+	assert response.status_code == 200
+	resp_dict = json.loads(response.data.decode('utf-8'))
+	assert resp_dict['title'] == "An unverified blog post"
 
 
 def test_signup_success(app, dbx, client, user_details, outbox):
