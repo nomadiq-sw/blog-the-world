@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import {
 	Alert,
 	Button,
@@ -23,10 +23,14 @@ import validateRecaptcha from '../utilities/validateRecaptcha'
 const NewPostModal = ({modalShow, postId, initLat, initLng}) => {
 	const [show, setShow] = useState(false)
 	const [post, setPost] = useState({})
+	const [formDisabled, setFormDisabled] = useState(false)
 	const [errorShow, setErrorShow] = useState(false)
 	const [errorContent, setErrorContent] = useState('')
 	const [successShow, setSuccessShow] = useState(false)
 	const [successContent, setSuccessContent] = useState('')
+	const formRef = useRef()
+	const validFormRef = useRef(false)
+	const {setToken, getToken, removeToken} = useToken()
 
 	const [title, setTitle] = useState('')
 	const [url, setUrl] = useState('')
@@ -90,11 +94,57 @@ const NewPostModal = ({modalShow, postId, initLat, initLng}) => {
 
 	const handleClose = () => {
 		setPost(defaultPost)
+		setErrorContent('')
+		setErrorShow(false)
+		setSuccessContent('')
+		setSuccessShow(false)
+		setFormDisabled(false)
 		setShow(false)
 	}
 
+  const validateForm = (event) => {
+    event.preventDefault()
+    setErrorShow(false)
+    setSuccessShow(false)
+    const form = formRef.current
+    validFormRef.current = form.checkValidity()
+    form.reportValidity()
+  }
+
 	const handleSubmit = (event) => {
-		event.preventDefault()
+		validateForm(event)
+		if (validFormRef.current) {
+			setFormDisabled(true)
+			return validateRecaptcha(validFormRef).then((recaptchaValid) => {
+				if (recaptchaValid) {
+					const token = getToken()
+					const headers = {'Authorization': `Bearer ${token}`}
+					axios.post(
+						process.env.REACT_APP_FLASK_API_URL + "/add-post",
+						{
+							post: null
+						},
+						{
+							headers: headers
+						}
+					).then((response) => {
+						setSuccessContent("Request to add or update post successful!")
+						setSuccessShow(true)
+						setTimeout(() => {handleClose()}, 2000)
+					}).catch((error) => {
+						if (error.response) {
+							setErrorContent("Request to add or update post failed with error " + error.response.data.message)
+							setErrorShow(true)
+							setFormDisabled(false)
+						}
+					})
+				} else {
+		      setErrorContent("Unable to confirm that you are not a robot. Please try again.")
+		      setErrorShow(true)
+					setFormDisabled(false)
+				}
+			})
+		}
 	}
 
 	const handleCoordinatesChanged = (event) => {
@@ -122,6 +172,7 @@ const NewPostModal = ({modalShow, postId, initLat, initLng}) => {
 			checks.push(
 				<FormGroup as={Col}>
 					<FormCheck type='checkbox'
+					           disabled={formDisabled}
 					           key={key}
 					           name={value}
 					           label={value}
@@ -141,13 +192,11 @@ const NewPostModal = ({modalShow, postId, initLat, initLng}) => {
 					newTrip.push(value)
 				}
 			})
-			console.log("Setting trip to", newTrip)
 			setTrip(newTrip)
 		}
 		else if (!trip.includes(event.target.value)) {
 			let newTrip = trip.map((x) => x)
 			newTrip.push(event.target.name)
-			console.log("Setting trip to", newTrip)
 			setTrip(newTrip)
 		}
 	}
@@ -164,10 +213,11 @@ const NewPostModal = ({modalShow, postId, initLat, initLng}) => {
         <Alert show={successShow} variant='success'>
           {successContent}
         </Alert>
-				<Form onSubmit={handleSubmit}>
+				<Form ref={formRef} onSubmit={handleSubmit}>
 					<FormGroup className='mb-2' controlId='formGroupPostTitle'>
 						<FormLabel className='fw-semibold'>Title*</FormLabel>
 						<FormControl type='text'
+						             disabled={formDisabled}
 						             required maxLength='180'
 						             defaultValue={post.title}
 						             onChange={(e) => setTitle(e.target.value)}/>
@@ -175,6 +225,7 @@ const NewPostModal = ({modalShow, postId, initLat, initLng}) => {
 					<FormGroup className='mb-2' controlId='formGroupPostURL'>
 						<FormLabel className='fw-semibold'>URL*</FormLabel>
 						<FormControl type='url'
+						             disabled={formDisabled}
 						             required maxLength='2048'
 						             defaultValue={post.url}
 						             onChange={(e) => setUrl(e.target.value)}/>
@@ -182,6 +233,7 @@ const NewPostModal = ({modalShow, postId, initLat, initLng}) => {
 					<FormGroup className='mb-2' controlId='formGroupPostLanguage'>
 						<FormLabel className='fw-semibold'>Language</FormLabel>
 						<FormSelect defaultValue={post.language}
+						            disabled={formDisabled}
 						            onChange={(e) => setLanguage(e.target.value)}>
 							{optionRows(Language)}
 						</FormSelect>
@@ -189,6 +241,7 @@ const NewPostModal = ({modalShow, postId, initLat, initLng}) => {
 					<FormGroup className='mb-2' controlId='formGroupTravelerType'>
 						<FormLabel className='fw-semibold'>Traveler type</FormLabel>
 						<FormSelect defaultValue={post.traveler}
+						            disabled={formDisabled}
 						            onChange={(e) => setTraveler(e.target.value)}>
 							<option key=''></option>
 							{optionRows(Traveler)}
@@ -217,6 +270,7 @@ const NewPostModal = ({modalShow, postId, initLat, initLng}) => {
 							             type='number' step='0.00001'
 							             min='-85.0' max='85.0'
 							             required
+							             disabled={formDisabled}
 							             defaultValue={post.latitude}
 							             onChange={handleCoordinatesChanged}>
 							</FormControl>
@@ -227,12 +281,13 @@ const NewPostModal = ({modalShow, postId, initLat, initLng}) => {
 							             type='number' step='0.00001'
 							             min='-179.99999' max='180.0'
 							             required
+							             disabled={formDisabled}
 							             defaultValue={post.longitude}
 							             onChange={handleCoordinatesChanged}>
 							</FormControl>
 						</FormGroup>
 					</Row>
-					<Button className="mt-3" type="submit">Submit</Button>
+					<Button className="mt-3" type="submit" disabled={formDisabled}>Submit</Button>
 				</Form>
 			</ModalBody>
 		</Modal>
