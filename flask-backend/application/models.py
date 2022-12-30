@@ -120,7 +120,7 @@ class Post(db.Model, SerializerMixin):
 	url = db.Column(db.String(2048), nullable=False)
 	date = db.Column(db.Date, nullable=False)
 	traveler = db.Column(db.Enum(TravelerTypes), nullable=True)
-	trip = db.Column(MutableSet.as_mutable(db.PickleType), default=[])
+	trip = db.Column(MutableSet.as_mutable(db.PickleType), default={})
 	latitude = db.Column(db.Float, nullable=False)
 	longitude = db.Column(db.Float, nullable=False)
 	verified = db.Column(db.Boolean, nullable=False, default=False, server_default="false")

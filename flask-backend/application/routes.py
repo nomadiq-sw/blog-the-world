@@ -3,7 +3,7 @@ import requests
 import logging
 import datetime
 from flask import jsonify, make_response, request, render_template, current_app, Blueprint
-from sqlalchemy.exc import NoResultFound
+from sqlalchemy.exc import NoResultFound, SQLAlchemyError
 from flask_cors import CORS
 from flask_praetorian import auth_required, roles_required, Praetorian
 from flask_praetorian.exceptions import (
@@ -181,8 +181,46 @@ def posts(
 @api.route("/add-post", methods=['POST'])
 @auth_required
 def add_post():
-	logging.info("Accepted POST request to add-post endpoint")
-	return '', 200
+	data = request.get_json(force=True)
+	auth_header = request.headers.get('Authorization')
+	token = auth_header.split()[1]
+	user_id = guard.extract_jwt_token(token).get('id')
+	user = User.identify(user_id)
+	if user and data:
+		try:
+			is_update = False
+			if data.get('update_id'):
+				is_update = True
+				pid = data.get('update_id')
+				post = db.session.execute(db.select(Post).filter_by(id=pid)).scalar_one()
+			else:
+				post = Post()
+			post.title = data.get('title')
+			post.url = data.get('url')
+			post.language = Languages(data.get('language')).name
+			post.date = datetime.date.today()
+			if data.get('traveler'):
+				post.traveler = TravelerTypes(data.get('traveler')).name
+			else:
+				post.traveler = None
+			post.trip = {tt for tt in data.get('trip')}
+			post.latitude = data.get('latitude')
+			post.longitude = data.get('longitude')
+			post.user = user_id
+			post.verified = False
+			if is_update:
+				db.session.merge(post)
+				message = "Post details updated successfully!"
+			else:
+				db.session.add(post)
+				message = "New post added successfully!"
+			db.session.commit()
+			return jsonify_message(message), 201
+		except (ValueError, SQLAlchemyError) as e:
+			logging.error(f"Exception {e}")
+			db.session.rollback()
+			return jsonify_message("Error adding or updating post, please try again later"), 400
+	return jsonify_message("An unexpected error occurred, please try again later"), 400
 
 
 @api.route("/delete-post/<slug>", methods=["POST"])

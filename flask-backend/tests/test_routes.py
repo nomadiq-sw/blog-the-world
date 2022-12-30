@@ -1,5 +1,6 @@
+import datetime
 import json
-from application.models import User
+from application.models import User, Post
 
 
 def test_get_posts(app, dbx, client, post_details, post):
@@ -189,7 +190,137 @@ def test_add_post_unauthenticated_user(client, user):
 	assert response.status_code == 401
 
 
-def test_add_post_authenticated_user(client, guard, user):
+def test_add_post_authenticated_user(app, dbx, client, guard, user, post_details):
 	token = guard.encode_jwt_token(user)
-	response = client.post('/add-post', headers={"Authorization": f"Bearer {token}"}, data={})
-	assert response.status_code == 200
+	response = client.post(
+		'/add-post',
+		headers={"Authorization": f"Bearer {token}"},
+		json={
+			"title": post_details['title'],
+			"url": post_details['url'],
+			"language": post_details['language'].value,
+			"traveler": post_details['traveler'].value,
+			"trip": [tt.value for tt in post_details['trip']],
+			"latitude": post_details['latitude'],
+			"longitude": post_details['longitude']
+		}
+	)
+	assert response.status_code == 201
+	assert b"New post added successfully" in response.data
+	post = dbx.session.query(Post).get(1)
+	assert post is not None
+	assert post.title == post_details['title']
+	assert post.url == post_details['url']
+	assert post.language == post_details['language']
+	assert post.traveler == post_details['traveler']
+	assert post.trip == post_details['trip']
+	assert post.date == datetime.date.today()
+	assert post.latitude == post_details['latitude']
+	assert post.longitude == post_details['longitude']
+	assert post.verified is False
+
+
+def test_add_post_invalid_token(app, dbx, client, guard, user, post_details):
+	token = guard.encode_jwt_token(user) + '123'
+	response = client.post(
+		'/add-post',
+		headers={"Authorization": f"Bearer {token}"},
+		json={
+			"title": post_details['title'],
+			"url": post_details['url'],
+			"language": post_details['language'].value,
+			"traveler": post_details['traveler'].value,
+			"trip": [tt.value for tt in post_details['trip']],
+			"latitude": post_details['latitude'],
+			"longitude": post_details['longitude']
+		}
+	)
+	assert response.status_code == 401
+
+
+def test_add_post_missing_data(app, dbx, client, guard, user, post_details):
+	token = guard.encode_jwt_token(user)
+	response = client.post(
+		'/add-post',
+		headers={"Authorization": f"Bearer {token}"},
+		json={
+			"title": post_details['title'],
+			"url": post_details['url'],
+			"language": post_details['language'].value,
+			"traveler": post_details['traveler'].value,
+			"trip": [tt.value for tt in post_details['trip']],
+			"latitude": post_details['latitude']
+		}
+	)
+	assert response.status_code == 400
+	assert b"Error adding or updating post" in response.data
+
+
+def test_add_post_invalid_data(app, dbx, client, guard, user, post_details):
+	token = guard.encode_jwt_token(user)
+	response = client.post(
+		'/add-post',
+		headers={"Authorization": f"Bearer {token}"},
+		json={
+			"title": post_details['title'],
+			"url": post_details['url'],
+			"language": "Gibberish",
+			"traveler": post_details['traveler'].value,
+			"trip": [tt.value for tt in post_details['trip']],
+			"latitude": post_details['latitude']
+		}
+	)
+	assert response.status_code == 400
+	assert b"Error adding or updating post" in response.data
+
+
+def test_update_existing_post(app, dbx, client, guard, user, post, post_details):
+	orig_post = dbx.session.query(Post).get(1)
+	assert orig_post is not None
+	assert orig_post.title == post_details['title']
+	assert orig_post.verified is True
+	token = guard.encode_jwt_token(user)
+	response = client.post(
+		'/add-post',
+		headers={"Authorization": f"Bearer {token}"},
+		json={
+			"update_id": 1,
+			"title": "An Updated Post Title",
+			"url": post_details['url'],
+			"language": post_details['language'].value,
+			"traveler": post_details['traveler'].value,
+			"trip": [tt.value for tt in post_details['trip']],
+			"latitude": post_details['latitude'],
+			"longitude": post_details['longitude']
+		}
+	)
+	assert response.status_code == 201
+	assert b"Post details updated successfully" in response.data
+	post = dbx.session.query(Post).get(1)
+	assert post is not None
+	assert post.title == "An Updated Post Title"
+	assert post.verified is False
+
+
+def test_update_existing_post_invalid_data(app, dbx, client, guard, user, post, post_details):
+	token = guard.encode_jwt_token(user)
+	response = client.post(
+		'/add-post',
+		headers={"Authorization": f"Bearer {token}"},
+		json={
+			"update_id": 1,
+			"title": "An Updated Post Title",
+			"url": post_details['url'],
+			"language": "Gibberish",
+			"traveler": post_details['traveler'].value,
+			"trip": [tt.value for tt in post_details['trip']],
+			"latitude": post_details['latitude'],
+			"longitude": post_details['longitude']
+		}
+	)
+	assert response.status_code == 400
+	assert b"Error adding or updating post" in response.data
+	post = dbx.session.query(Post).get(1)
+	assert post is not None
+	assert post.title == post_details['title']
+	assert post.verified is True
