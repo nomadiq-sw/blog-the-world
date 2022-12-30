@@ -71,8 +71,8 @@ const NewPostModal = ({modalShow, postId, initLat, initLng}) => {
 	}, [post])
 
 	useEffect(() => {
-		for (const [key, val] of Object.entries(Trip)) {
-			if (trip.includes(val)) {
+		for (const key of Object.keys(Trip)) {
+			if (trip.includes(key)) {
 				tripCheckboxStatus.set(key, true)
 			}
 		}
@@ -122,18 +122,25 @@ const NewPostModal = ({modalShow, postId, initLat, initLng}) => {
 					axios.post(
 						process.env.REACT_APP_FLASK_API_URL + "/add-post",
 						{
-							post: null
+							update_id: postId,
+							title: title,
+							url: url,
+							language: language,
+							traveler: traveler,
+							trip: trip,
+							latitude: latitude,
+							longitude: longitude
 						},
 						{
 							headers: headers
 						}
 					).then((response) => {
-						setSuccessContent("Request to add or update post successful!")
+						setSuccessContent(response.data.message)
 						setSuccessShow(true)
 						setTimeout(() => {handleClose()}, 2000)
 					}).catch((error) => {
 						if (error.response) {
-							setErrorContent("Request to add or update post failed with error " + error.response.data.message)
+							setErrorContent(error.response.data.message)
 							setErrorShow(true)
 							setFormDisabled(false)
 						}
@@ -174,7 +181,7 @@ const NewPostModal = ({modalShow, postId, initLat, initLng}) => {
 					<FormCheck type='checkbox'
 					           disabled={formDisabled}
 					           key={key}
-					           name={value}
+					           name={key}
 					           label={value}
 					           checked={checkboxState.get(key)}
 					           onChange={checkHandler}/>
@@ -194,7 +201,7 @@ const NewPostModal = ({modalShow, postId, initLat, initLng}) => {
 			})
 			setTrip(newTrip)
 		}
-		else if (!trip.includes(event.target.value)) {
+		else if (!trip.includes(event.target.name)) {
 			let newTrip = trip.map((x) => x)
 			newTrip.push(event.target.name)
 			setTrip(newTrip)
