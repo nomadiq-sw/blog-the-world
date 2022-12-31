@@ -159,7 +159,9 @@ def posts(
 			)).all()
 		post_list = []
 		for post in all_posts:
-			post_list.append(post[0].to_dict())
+			post_dict = post[0].to_dict()
+			post_dict['trip'] = [tt.name for tt in post_dict['trip']]
+			post_list.append(post_dict)
 		response = make_response(post_list), 200  # N.B. DO NOT JSONIFY: Flask does it automatically
 	else:
 		try:
@@ -169,6 +171,7 @@ def posts(
 			).one()
 			# Ignore warning about access to protected member, this is from the NamedTuple API:
 			post_dict = post._asdict()['Post'].to_dict()
+			post_dict['trip'] = [tt.name for tt in post_dict['trip']]
 			if not include_unverified and not post_dict['verified']:
 				raise NoResultFound
 			response = make_response(post_dict), 200
@@ -203,7 +206,7 @@ def add_post():
 				post.traveler = TravelerTypes(data.get('traveler')).name
 			else:
 				post.traveler = None
-			post.trip = {tt for tt in data.get('trip')}
+			post.trip = {TripTypes[tt] for tt in data.get('trip')}
 			post.latitude = data.get('latitude')
 			post.longitude = data.get('longitude')
 			post.user = user_id

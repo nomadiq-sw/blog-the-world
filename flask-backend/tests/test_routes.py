@@ -200,7 +200,7 @@ def test_add_post_authenticated_user(app, dbx, client, guard, user, post_details
 			"url": post_details['url'],
 			"language": post_details['language'].value,
 			"traveler": post_details['traveler'].value,
-			"trip": [tt.value for tt in post_details['trip']],
+			"trip": [tt.name for tt in post_details['trip']],
 			"latitude": post_details['latitude'],
 			"longitude": post_details['longitude']
 		}
@@ -230,7 +230,7 @@ def test_add_post_invalid_token(app, dbx, client, guard, user, post_details):
 			"url": post_details['url'],
 			"language": post_details['language'].value,
 			"traveler": post_details['traveler'].value,
-			"trip": [tt.value for tt in post_details['trip']],
+			"trip": [tt.name for tt in post_details['trip']],
 			"latitude": post_details['latitude'],
 			"longitude": post_details['longitude']
 		}
@@ -248,7 +248,7 @@ def test_add_post_missing_data(app, dbx, client, guard, user, post_details):
 			"url": post_details['url'],
 			"language": post_details['language'].value,
 			"traveler": post_details['traveler'].value,
-			"trip": [tt.value for tt in post_details['trip']],
+			"trip": [tt.name for tt in post_details['trip']],
 			"latitude": post_details['latitude']
 		}
 	)
@@ -266,7 +266,7 @@ def test_add_post_invalid_data(app, dbx, client, guard, user, post_details):
 			"url": post_details['url'],
 			"language": "Gibberish",
 			"traveler": post_details['traveler'].value,
-			"trip": [tt.value for tt in post_details['trip']],
+			"trip": [tt.name for tt in post_details['trip']],
 			"latitude": post_details['latitude']
 		}
 	)
@@ -278,6 +278,7 @@ def test_update_existing_post(app, dbx, client, guard, user, post, post_details)
 	orig_post = dbx.session.query(Post).get(1)
 	assert orig_post is not None
 	assert orig_post.title == post_details['title']
+	assert orig_post.trip == post_details['trip']
 	assert orig_post.verified is True
 	token = guard.encode_jwt_token(user)
 	response = client.post(
@@ -289,7 +290,7 @@ def test_update_existing_post(app, dbx, client, guard, user, post, post_details)
 			"url": post_details['url'],
 			"language": post_details['language'].value,
 			"traveler": post_details['traveler'].value,
-			"trip": [tt.value for tt in post_details['trip']],
+			"trip": [tt.name for tt in post_details['trip']],
 			"latitude": post_details['latitude'],
 			"longitude": post_details['longitude']
 		}
@@ -299,6 +300,7 @@ def test_update_existing_post(app, dbx, client, guard, user, post, post_details)
 	post = dbx.session.query(Post).get(1)
 	assert post is not None
 	assert post.title == "An Updated Post Title"
+	assert post.trip == post_details['trip']
 	assert post.verified is False
 
 
@@ -313,7 +315,7 @@ def test_update_existing_post_invalid_data(app, dbx, client, guard, user, post, 
 			"url": post_details['url'],
 			"language": "Gibberish",
 			"traveler": post_details['traveler'].value,
-			"trip": [tt.value for tt in post_details['trip']],
+			"trip": [tt.name for tt in post_details['trip']],
 			"latitude": post_details['latitude'],
 			"longitude": post_details['longitude']
 		}

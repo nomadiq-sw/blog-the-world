@@ -70,7 +70,7 @@ def post_details():
 	url = "https://blog.com/my-first-blog-post/"
 	date = datetime.date.today()
 	traveler = TravelerTypes.Family
-	trip = {TripTypes.Camping, TripTypes.Roadtrip}
+	trip = {TripTypes.Camping, TripTypes.Mini}
 	latitude = 37.26801
 	longitude = -90.20220
 	verified = True

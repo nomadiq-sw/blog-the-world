@@ -28,6 +28,7 @@ class Languages(str, enum.Enum):
 class TravelerTypes(str, enum.Enum):
 	Couple = 'Couple'
 	Family = 'Family'
+	Friends = 'Friends'
 	Group = 'Group'
 	Solo = 'Solo'
 

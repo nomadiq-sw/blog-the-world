@@ -19,6 +19,7 @@ export const Language = {
 export const Traveler = {
 	Couple: 'Couple',
 	Family: 'Family',
+	Friends: 'Friends',
 	Group: 'Group',
 	Solo: 'Solo',
 }
