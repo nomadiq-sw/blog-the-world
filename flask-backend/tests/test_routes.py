@@ -326,3 +326,92 @@ def test_update_existing_post_invalid_data(app, dbx, client, guard, user, post, 
 	assert post is not None
 	assert post.title == post_details['title']
 	assert post.verified is True
+
+
+def test_update_existing_post_invalid_id(app, dbx, client, guard, user, post, post_details):
+	token = guard.encode_jwt_token(user)
+	response = client.post(
+		'/add-post',
+		headers={"Authorization": f"Bearer {token}"},
+		json={
+			"update_id": 2,
+			"title": "An Updated Post Title",
+			"url": post_details['url'],
+			"language": post_details['language'].value,
+			"traveler": post_details['traveler'].value,
+			"trip": [tt.name for tt in post_details['trip']],
+			"latitude": post_details['latitude'],
+			"longitude": post_details['longitude']
+		}
+	)
+	assert response.status_code == 400
+	assert b"Error adding or updating post" in response.data
+	post = dbx.session.query(Post).get(1)
+	assert post is not None
+	assert post.title == post_details['title']
+	assert post.verified is True
+
+
+def test_delete_post_unauthenticated(app, dbx, client, post):
+	response = client.delete(
+		'/delete-post/1'
+	)
+	assert response.status_code == 401
+	n_posts = dbx.session.query(Post).count()
+	assert n_posts == 1
+
+
+def test_delete_post_non_admin_user(app, dbx, client, guard, user, post):
+	token = guard.encode_jwt_token(user)
+	response = client.delete(
+		'/delete-post/1',
+		headers={"Authorization": f"Bearer {token}"}
+	)
+	assert response.status_code == 403
+	n_posts = dbx.session.query(Post).count()
+	assert n_posts == 1
+
+
+def test_delete_post_admin_user(app, dbx, client, guard, post):
+	n_posts_orig = dbx.session.query(Post).count()
+	assert n_posts_orig == 1
+	test_user = User(
+		email='admin@blog-the-world.com',
+		password=guard.hash_password('adminPassword'),
+		roles='admin',
+		is_active=True
+	)
+	dbx.session.add(test_user)
+	dbx.session.commit()
+	admin = dbx.session.query(User).filter_by(roles='admin').one()
+	assert admin is not None
+	token = guard.encode_jwt_token(admin)
+	response = client.delete(
+		'/delete-post/1',
+		headers={"Authorization": f"Bearer {token}"}
+	)
+	assert response.status_code == 200
+	assert b'Post deleted successfully' in response.data
+	n_posts_new = dbx.session.query(Post).count()
+	assert n_posts_new == 0
+
+
+def test_delete_post_invalid_id(app, dbx, client, guard, post):
+	test_user = User(
+		email='admin@blog-the-world.com',
+		password=guard.hash_password('adminPassword'),
+		roles='admin',
+		is_active=True
+	)
+	dbx.session.add(test_user)
+	dbx.session.commit()
+	admin = dbx.session.query(User).filter_by(roles='admin').one()
+	token = guard.encode_jwt_token(admin)
+	response = client.delete(
+		'/delete-post/2',
+		headers={"Authorization": f"Bearer {token}"}
+	)
+	assert response.status_code == 404
+	assert b'Failed to delete post' in response.data
+	n_posts = dbx.session.query(Post).count()
+	assert n_posts == 1

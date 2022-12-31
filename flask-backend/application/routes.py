@@ -220,13 +220,20 @@ def add_post():
 			db.session.commit()
 			return jsonify_message(message), 201
 		except (ValueError, SQLAlchemyError) as e:
-			logging.error(f"Exception {e}")
+			logging.error(f"Exception in add_post: {e}")
 			db.session.rollback()
 			return jsonify_message("Error adding or updating post, please try again later"), 400
 	return jsonify_message("An unexpected error occurred, please try again later"), 400
 
 
-@api.route("/delete-post/<slug>", methods=["POST"])
+@api.route("/delete-post/<slug>", methods=["DELETE"])
 @roles_required("admin")
-def delete_post():
-	pass
+def delete_post(slug=None):
+	try:
+		post_to_delete = db.session.execute(db.select(Post).filter_by(id=slug)).one()
+		db.session.delete(post_to_delete[0])
+		db.session.commit()
+		return jsonify_message("Post deleted successfully"), 200
+	except (NoResultFound, SQLAlchemyError) as e:
+		logging.error(f'Exception in delete_post: {e}')
+		return jsonify_message('Failed to delete post, please try again later'), 404
