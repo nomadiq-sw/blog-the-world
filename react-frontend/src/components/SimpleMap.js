@@ -4,6 +4,7 @@ import Marker from './Marker'
 import NewPostMenu from './NewPostMenu'
 import NewPostModal from './NewPostModal'
 import axios from "axios";
+import useToken from '../utilities/useToken'
 
 const SimpleMap = () => {
 	const [pins, setPins] = useState([])
@@ -13,6 +14,7 @@ const SimpleMap = () => {
 	const [menuEditPost, setMenuEditPost] = useState(0)
 	const [menuPosition, setMenuPosition] = useState({lat: 20.0, lng: 10.0})
 	const [modalShow, setModalShow] = useState(0)
+	const {setToken, getToken, removeToken} = useToken()
 
 	const handleGoogleApiLoaded = (map, maps) => {
 	  maps.event.addListener(map, "contextmenu", function(ev) {
@@ -33,7 +35,20 @@ const SimpleMap = () => {
 	}
 
 	const handleDeletePostClick = () => {
-		console.log("Deleting post with ID " + menuEditPost)
+		const token = getToken()
+		const headers = {'Authorization': `Bearer ${token}`}
+		axios.delete(
+			process.env.REACT_APP_FLASK_API_URL + '/delete-post/' + menuEditPost,
+			{
+				headers: headers
+			}
+		).then(
+			(response) => {handlePostUpdate()}
+		).catch((error) => {
+			if (error.response) {
+				window.alert(error.response.data.message)
+			}
+		})
 	}
 
 	useEffect(() => {
