@@ -1,10 +1,12 @@
-import {useState} from 'react'
+import {useEffect, useState} from 'react'
 import GoogleMapReact from 'google-map-react'
 import Marker from './Marker'
 import NewPostMenu from './NewPostMenu'
 import NewPostModal from './NewPostModal'
+import axios from "axios";
 
-const SimpleMap = (props) => {
+const SimpleMap = () => {
+	const [pins, setPins] = useState([])
 	const [center, setCenter] = useState({lat: 20.0, lng: 10.0 })
 	const [zoom, setZoom] = useState(2.5)
 	const [menuState, setMenuState] = useState(false)
@@ -28,6 +30,22 @@ const SimpleMap = (props) => {
 
 	const handleNewPostMenuClick = () => {
 		setModalShow(modalShow + 1)
+	}
+
+	useEffect(() => {
+		handlePostUpdate()
+	}, [])
+
+	const handlePostUpdate = () => {
+		axios.get(process.env.REACT_APP_FLASK_API_URL + "/posts").then(
+				(response) => {
+					setPins(response.data)
+				}
+		).catch(
+				(err) => {
+					return `Error: ${err.message}`
+				}
+		)
 	}
 
 	return (
@@ -58,13 +76,17 @@ const SimpleMap = (props) => {
 			             handleMenuClick={handleNewPostMenuClick}
 			             lat={menuPosition.lat}
 			             lng={menuPosition.lng}/>
-			<NewPostModal modalShow={modalShow} postId={menuEditPost} initLat={menuPosition.lat} initLng={menuPosition.lng}/>
-			{props.pins.map((post) => (
+			<NewPostModal modalShow={modalShow}
+			              postId={menuEditPost}
+			              initLat={menuPosition.lat}
+			              initLng={menuPosition.lng}
+			              handlePostUpdate={handlePostUpdate}/>
+			{pins.map((pin) => (
 				<Marker
-					key={post.id}
-					post={post}
-					lat={post.latitude}
-					lng={post.longitude}
+					key={pin.id}
+					post={pin}
+					lat={pin.latitude}
+					lng={pin.longitude}
 				/>
 			))}
 		</GoogleMapReact>

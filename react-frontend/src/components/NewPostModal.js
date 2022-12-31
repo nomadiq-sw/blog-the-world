@@ -20,7 +20,7 @@ import {Language, Traveler, Trip} from '../utilities/enums'
 import useToken from '../utilities/useToken'
 import validateRecaptcha from '../utilities/validateRecaptcha'
 
-const NewPostModal = ({modalShow, postId, initLat, initLng}) => {
+const NewPostModal = ({modalShow, postId, initLat, initLng, handlePostUpdate}) => {
 	const [show, setShow] = useState(false)
 	const [post, setPost] = useState({})
 	const [formDisabled, setFormDisabled] = useState(false)
@@ -137,6 +137,7 @@ const NewPostModal = ({modalShow, postId, initLat, initLng}) => {
 					).then((response) => {
 						setSuccessContent(response.data.message)
 						setSuccessShow(true)
+						handlePostUpdate()
 						setTimeout(() => {handleClose()}, 2000)
 					}).catch((error) => {
 						if (error.response) {
