@@ -6,12 +6,14 @@ import {
 	FormGroup,
 	FormLabel,
 	FormControl,
+	InputGroup,
 	Modal,
 	ModalHeader,
 	ModalTitle,
 	ModalBody,
 } from 'react-bootstrap'
 import axios from 'axios'
+import {AiFillEye, AiFillEyeInvisible} from 'react-icons/ai'
 import {useLoaderData, useNavigate} from 'react-router-dom'
 
 export async function loader({ params }) {
@@ -24,6 +26,7 @@ const PasswordResetModal = () => {
 	const [errorContent, setErrorContent] = useState("")
 	const [successShow, setSuccessShow] = useState(false)
 	const [successContent, setSuccessContent] = useState("")
+  const [passwordShow, setPasswordShow] = useState(false)
   const [resetForm, setResetForm] = useState({
     password: ""
   })
@@ -83,6 +86,10 @@ const PasswordResetModal = () => {
     }))
 	}
 
+	const togglePasswordShow = () => {
+		setPasswordShow(!passwordShow)
+	}
+
 	return (
 		<Modal show={show} onHide={handleClose}>
 			<ModalHeader closeButton>
@@ -100,14 +107,19 @@ const PasswordResetModal = () => {
 						<FormLabel>
 							New password
 						</FormLabel>
-						<FormControl onChange={handleChange}
-						             ref={passwordRef}
-						             required
-						             minLength="8"
-						             type="password"
-						             name="password"
-						             placeholder="Password"
-						             value={resetForm.password}/>
+						<InputGroup>
+							<FormControl onChange={handleChange}
+							             ref={passwordRef}
+							             required
+							             minLength="8"
+							             type={passwordShow ? "text" : "password"}
+							             name="password"
+							             placeholder="Password"
+							             value={resetForm.password}/>
+                <Button variant='outline-secondary' onClick={togglePasswordShow}>
+                  {passwordShow ? <AiFillEyeInvisible/> : <AiFillEye/>}
+                </Button>
+						</InputGroup>
 					</FormGroup>
 					<Button className="mt-3" type="submit">Submit</Button>
 				</Form>

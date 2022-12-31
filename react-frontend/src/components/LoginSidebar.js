@@ -6,12 +6,14 @@ import {
   FormGroup,
   FormLabel,
   FormControl,
+  InputGroup,
   Offcanvas,
   OffcanvasHeader,
   OffcanvasTitle,
   OffcanvasBody,
 } from 'react-bootstrap'
 import axios from 'axios'
+import {AiFillEye, AiFillEyeInvisible} from 'react-icons/ai'
 import useToken from '../utilities/useToken'
 import validateRecaptcha from '../utilities/validateRecaptcha'
 
@@ -21,6 +23,7 @@ const LoginSidebar = (props) => {
   const [errorContent, setErrorContent] = useState("")
   const [successShow, setSuccessShow] = useState(false)
   const [successContent, setSuccessContent] = useState("")
+  const [passwordShow, setPasswordShow] = useState(false)
   const [loginForm, setLoginForm] = useState({
     email: "",
     password: ""
@@ -177,6 +180,10 @@ const LoginSidebar = (props) => {
     }))
   }
 
+  const togglePasswordShow = () => {
+    setPasswordShow(!passwordShow)
+  }
+
   return (
     <div>
       <Button variant="primary" onClick={handleShow} className="btn-sm me-2">
@@ -207,14 +214,19 @@ const LoginSidebar = (props) => {
             </FormGroup>
             <FormGroup className="mb-2" controlId='formGroupPassword'>
               <FormLabel>Password</FormLabel>
-              <FormControl onChange={handleChange}
-                           disabled={formDisabled}
-                           required
-                           minLength="8"
-                           type="password"
-                           name="password"
-                           placeholder="Password"
-                           value={loginForm.password}/>
+              <InputGroup>
+                <FormControl onChange={handleChange}
+                             disabled={formDisabled}
+                             required
+                             minLength="8"
+                             type={passwordShow ? "text" : "password"}
+                             name="password"
+                             placeholder="Password"
+                             value={loginForm.password}/>
+                <Button variant='outline-secondary' onClick={togglePasswordShow}>
+                  {passwordShow ? <AiFillEyeInvisible/> : <AiFillEye/>}
+                </Button>
+              </InputGroup>
             </FormGroup>
             <span className="text-black-50">
               By registering, you accept the terms & conditions and privacy policy.
