@@ -32,6 +32,10 @@ const SimpleMap = () => {
 		setModalShow(modalShow + 1)
 	}
 
+	const handleDeletePostClick = () => {
+		console.log("Deleting post with ID " + menuEditPost)
+	}
+
 	useEffect(() => {
 		handlePostUpdate()
 	}, [])
@@ -74,6 +78,7 @@ const SimpleMap = () => {
 			<NewPostMenu state={menuState}
 			             edit={menuEditPost}
 			             handleMenuClick={handleNewPostMenuClick}
+			             handleDeleteClick={handleDeletePostClick}
 			             lat={menuPosition.lat}
 			             lng={menuPosition.lng}/>
 			<NewPostModal modalShow={modalShow}
