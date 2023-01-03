@@ -267,8 +267,7 @@ const NewPostModal = ({modalShow, postId, initLat, initLng, handlePostUpdate}) =
 							{optionChecks(Trip, tripCheckboxState, tripTypeCheckHandler).slice(6, 9)}
 						</Row>
 						<Row>
-							{optionChecks(Trip, tripCheckboxState, tripTypeCheckHandler).slice(9,11)}
-							<FormGroup as={Col}/> {/* Empty FormGroup for padding */}
+							{optionChecks(Trip, tripCheckboxState, tripTypeCheckHandler).slice(9,12)}
 						</Row>
 					</FormGroup>
 					<Row>

@@ -41,6 +41,7 @@ class TripTypes(str, enum.Enum):
 	Cruise = 'Cruise'
 	Cycling = 'Cycling'
 	Hiking = 'Hiking'
+	Long = 'Long stay'
 	Mini = 'Mini-break'
 	Package = 'Package holiday'
 	Roadtrip = 'Roadtrip'
