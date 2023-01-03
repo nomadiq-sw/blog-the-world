@@ -30,11 +30,11 @@ const router = createBrowserRouter([
 	}
 ])
 
-const script = document.createElement('script')
-script.src =
+const recaptcha_script = document.createElement('script')
+recaptcha_script.src =
 	`https://www.google.com/recaptcha/api.js?badge=bottomleft&render=${process.env.REACT_APP_RECAPTCHA_SITE_KEY}`
-script.id = 'recaptcha_script'
-document.head.appendChild(script)
+recaptcha_script.id = 'recaptcha_script'
+document.head.appendChild(recaptcha_script)
 
 const root = ReactDOM.createRoot(document.getElementById('root'))
 
