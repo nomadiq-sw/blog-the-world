@@ -2,20 +2,20 @@ import {useRef, useEffect, useCallback} from 'react'
 import {Container, FormControl, Row, Col} from 'react-bootstrap'
 
 // This component pillaged from https://stackoverflow.com/a/63279728/7126999 (accessed 2023-01-03)
-const SearchBox = ({maps, onPlacesChanged, placeholder}) => {
+const SearchBox = ({maps, onPlaceChanged, placeholder}) => {
 	const input = useRef(null)
 	const searchBox = useRef(null)
 
-	const handleOnPlacesChanged = useCallback(() => {
-		if (onPlacesChanged) {
-			onPlacesChanged(searchBox.current.getPlaces())
+	const handleOnPlaceChanged = useCallback(() => {
+		if (onPlaceChanged) {
+			onPlaceChanged(searchBox.current.getPlace())
 		}
-	}, [onPlacesChanged, searchBox])
+	}, [onPlaceChanged, searchBox])
 
 	useEffect(() => {
 		if (!searchBox.current && maps) {
-			searchBox.current = new maps.places.SearchBox(input.current)
-			searchBox.current.addListener('places_changed', handleOnPlacesChanged)
+			searchBox.current = new maps.places.Autocomplete(input.current, {fields: ['place_id', 'geometry', 'name']})
+			searchBox.current.addListener('place_changed', handleOnPlaceChanged)
 		}
 
 		return () => {
@@ -24,7 +24,7 @@ const SearchBox = ({maps, onPlacesChanged, placeholder}) => {
 				maps.event.clearInstanceListeners(searchBox)
 			}
 		}
-	}, [maps, handleOnPlacesChanged])
+	}, [maps, handleOnPlaceChanged])
 
 	return (
 		<Container className='m-0'>

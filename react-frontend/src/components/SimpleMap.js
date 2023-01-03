@@ -36,10 +36,10 @@ const SimpleMap = () => {
 	}
 
 	// This callback pillaged from a comment on https://stackoverflow.com/a/63279728/7126999 (accessed 2023-01-03)
-	const handleOnPlacesChanged = useCallback(e => {
-		if (e && e[0] && e[0].geometry) {
-			const lat = e[0].geometry.location.lat()
-			const lng = e[0].geometry.location.lng()
+	const handleOnPlaceChanged = useCallback(e => {
+		if (e && e.geometry) {
+			const lat = e.geometry.location.lat()
+			const lng = e.geometry.location.lng()
 			gmap.setCenter({lat, lng})
 			gmap.setZoom(12)
 		}
@@ -86,7 +86,7 @@ const SimpleMap = () => {
 		<div className='position-relative h-100 w-100'>
 			<div style={{zIndex:'9'}} className='position-absolute w-auto top-0 start-0 px-1 py-3'>
 				<SearchBox maps={googlemaps}
-				           onPlacesChanged={handleOnPlacesChanged}
+				           onPlaceChanged={handleOnPlaceChanged}
 				           placeholder='Find location...'/>
 			</div>
 			<div style={{zIndex:'1'}} className='position-absolute w-100 h-100'>
