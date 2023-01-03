@@ -2,6 +2,7 @@ import enum
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.ext.mutable import MutableSet
 from sqlalchemy_serializer import SerializerMixin
+from sqlalchemy.orm import validates
 
 db = SQLAlchemy()
 
@@ -127,3 +128,19 @@ class Post(db.Model, SerializerMixin):
 	longitude = db.Column(db.Float, nullable=False)
 	verified = db.Column(db.Boolean, nullable=False, default=False, server_default="false")
 	user = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+
+	@validates('latitude')
+	def validate_latitude(self, key, latitude):
+		if latitude:
+			if latitude < -90.0 or latitude > 90.0:
+				raise ValueError("Invalid latitude value")
+			return latitude
+		raise ValueError("No latitude value provided")
+
+	@validates('longitude')
+	def validate_longitude(self, key, longitude):
+		if longitude:
+			if longitude <= -180.0 or longitude > 180.0:
+				raise ValueError("Invalid longitude value")
+			return longitude
+		raise ValueError("No longitude value provided")

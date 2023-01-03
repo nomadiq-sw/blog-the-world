@@ -44,6 +44,9 @@ def test_get_single_post_invalid_id(app, dbx, client, post):
 	response = client.get('/posts/0')
 	assert response.status_code == 404
 	assert response.data.decode('utf-8') == ''
+	response = client.get('/posts/2')
+	assert response.status_code == 404
+	assert response.data.decode('utf-8') == ''
 
 
 def test_get_single_post_expired(app, dbx, client, expired_post):
@@ -256,7 +259,7 @@ def test_add_post_missing_data(app, dbx, client, guard, user, post_details):
 	assert b"Error adding or updating post" in response.data
 
 
-def test_add_post_invalid_data(app, dbx, client, guard, user, post_details):
+def test_add_post_invalid_language(app, dbx, client, guard, user, post_details):
 	token = guard.encode_jwt_token(user)
 	response = client.post(
 		'/add-post',
@@ -267,7 +270,65 @@ def test_add_post_invalid_data(app, dbx, client, guard, user, post_details):
 			"language": "Gibberish",
 			"traveler": post_details['traveler'].value,
 			"trip": [tt.name for tt in post_details['trip']],
-			"latitude": post_details['latitude']
+			"latitude": post_details['latitude'],
+			"longitude": post_details['longitude']
+		}
+	)
+	assert response.status_code == 400
+	assert b"Error adding or updating post" in response.data
+
+
+def test_add_post_invalid_traveler(app, dbx, client, guard, user, post_details):
+	token = guard.encode_jwt_token(user)
+	response = client.post(
+		'/add-post',
+		headers={"Authorization": f"Bearer {token}"},
+		json={
+			"title": post_details['title'],
+			"url": post_details['url'],
+			"language": post_details['language'].value,
+			"traveler": "Ozymandias",
+			"trip": [tt.name for tt in post_details['trip']],
+			"latitude": post_details['latitude'],
+			"longitude": post_details['longitude']
+		}
+	)
+	assert response.status_code == 400
+	assert b"Error adding or updating post" in response.data
+
+
+def test_add_post_invalid_trip_list(app, dbx, client, guard, user, post_details):
+	token = guard.encode_jwt_token(user)
+	response = client.post(
+		'/add-post',
+		headers={"Authorization": f"Bearer {token}"},
+		json={
+			"title": post_details['title'],
+			"url": post_details['url'],
+			"language": post_details['language'].value,
+			"traveler": post_details['traveler'].value,
+			"trip": ['NotATrip', 'NotATripEither'],
+			"latitude": post_details['latitude'],
+			"longitude": post_details['longitude']
+		}
+	)
+	assert response.status_code == 400
+	assert b"Error adding or updating post" in response.data
+
+
+def test_add_post_invalid_trip_string(app, dbx, client, guard, user, post_details):
+	token = guard.encode_jwt_token(user)
+	response = client.post(
+		'/add-post',
+		headers={"Authorization": f"Bearer {token}"},
+		json={
+			"title": post_details['title'],
+			"url": post_details['url'],
+			"language": post_details['language'].value,
+			"traveler": post_details['traveler'].value,
+			"trip": list(post_details['trip'])[0].name,
+			"latitude": post_details['latitude'],
+			"longitude": post_details['longitude']
 		}
 	)
 	assert response.status_code == 400

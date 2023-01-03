@@ -151,15 +151,15 @@ def posts(
 		if include_unverified:
 			all_posts = db.session.execute(db.select(Post).filter(
 				Post.date > cutoff_date)
-			).all()
+			).scalars()
 		else:
 			all_posts = db.session.execute(db.select(Post).filter(
 				Post.date > cutoff_date,
 				Post.verified is True
-			)).all()
+			)).scalars()
 		post_list = []
 		for post in all_posts:
-			post_dict = post[0].to_dict()
+			post_dict = post.to_dict()
 			post_dict['trip'] = [tt.name for tt in post_dict['trip']]
 			post_list.append(post_dict)
 		response = make_response(post_list), 200  # N.B. DO NOT JSONIFY: Flask does it automatically
@@ -168,9 +168,9 @@ def posts(
 			post = db.session.execute(db.select(Post).filter(
 				Post.id == slug,
 				Post.date > cutoff_date)
-			).one()
+			).scalar_one()
 			# Ignore warning about access to protected member, this is from the NamedTuple API:
-			post_dict = post._asdict()['Post'].to_dict()
+			post_dict = post.to_dict()
 			post_dict['trip'] = [tt.name for tt in post_dict['trip']]
 			if not include_unverified and not post_dict['verified']:
 				raise NoResultFound
@@ -219,7 +219,7 @@ def add_post():
 				message = "New post added successfully!"
 			db.session.commit()
 			return jsonify_message(message), 201
-		except (ValueError, SQLAlchemyError) as e:
+		except (KeyError, ValueError, SQLAlchemyError) as e:
 			logging.error(f"Exception in add_post: {e}")
 			db.session.rollback()
 			return jsonify_message("Error adding or updating post, please try again later"), 400
@@ -230,8 +230,8 @@ def add_post():
 @roles_required("admin")
 def delete_post(slug=None):
 	try:
-		post_to_delete = db.session.execute(db.select(Post).filter_by(id=slug)).one()
-		db.session.delete(post_to_delete[0])
+		post_to_delete = db.session.execute(db.select(Post).filter_by(id=slug)).scalar_one()
+		db.session.delete(post_to_delete)
 		db.session.commit()
 		return jsonify_message("Post deleted successfully"), 200
 	except (NoResultFound, SQLAlchemyError) as e:
