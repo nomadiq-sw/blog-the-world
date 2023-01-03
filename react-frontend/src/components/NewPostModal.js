@@ -85,7 +85,14 @@ const NewPostModal = ({modalShow, postId, initLat, initLng, handlePostUpdate}) =
 				(response) => {
 					setPost(response.data)
 				}
-			).then(() => {setShow(true)})
+			).then(
+				() => {setShow(true)}
+			).catch((error) => {
+				if (error.response.status === 404) {
+					window.alert("Post not found! It may have been deleted.")
+					handlePostUpdate()
+				}
+			})
 		} else {
 			setPost(defaultPost)
 			setShow(true)
