@@ -7,7 +7,6 @@ const SearchBox = ({maps, onPlacesChanged, placeholder}) => {
 	const searchBox = useRef(null)
 
 	const handleOnPlacesChanged = useCallback(() => {
-		console.log("Places changed, handler called")
 		if (onPlacesChanged) {
 			onPlacesChanged(searchBox.current.getPlaces())
 		}
@@ -16,7 +15,6 @@ const SearchBox = ({maps, onPlacesChanged, placeholder}) => {
 	useEffect(() => {
 		if (!searchBox.current && maps) {
 			searchBox.current = new maps.places.SearchBox(input.current)
-			console.log("SearchBox ref updated, adding listener")
 			searchBox.current.addListener('places_changed', handleOnPlacesChanged)
 		}
 
