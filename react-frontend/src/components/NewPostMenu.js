@@ -25,7 +25,7 @@ const Menu = styled(ControlledMenu)`
   }
 `
 
-const NewPostMenu = ({state, edit, handleMenuClick, handleDeleteClick}) => {
+const NewPostMenu = ({state, edit, handleEditClick, handleDeleteClick}) => {
   const [menuProps, toggleMenu] = useMenuState()
 	const authTokenIsAbsent = () => localStorage.getItem('token') === null
 
@@ -43,7 +43,7 @@ const NewPostMenu = ({state, edit, handleMenuClick, handleDeleteClick}) => {
 	return (
     <Menu {...menuProps} aria-label='Add or edit a post' onClose={() => toggleMenu(false)}>
 	    <MenuItem disabled={authTokenIsAbsent()}
-	              onClick={() => {toggleMenu(false); handleMenuClick()}}
+	              onClick={() => {toggleMenu(false); handleEditClick()}}
 	              aria-label={edit ? 'Edit post' : 'Add post'}>
 		    {edit ? 'Edit' : 'Add'} post
 			</MenuItem>

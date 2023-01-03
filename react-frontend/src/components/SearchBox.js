@@ -30,11 +30,7 @@ const SearchBox = ({maps, onPlacesChanged, placeholder}) => {
 
 	return (
 		<Container className='m-0'>
-			<Row xs={2} lg={3} xl={4}>
-				<Col>
-					<FormControl ref={input} placeholder={placeholder} type='text'/>
-				</Col>
-			</Row>
+			<FormControl className='w-auto' ref={input} placeholder={placeholder} type='text'/>
 		</Container>
 	)
 }
