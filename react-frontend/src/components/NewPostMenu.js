@@ -31,7 +31,7 @@ const NewPostMenu = ({state, edit, handleEditClick, handleDeleteClick}) => {
 
 	toggleMenu(state)
 
-	const confirmDelete = (event) => {
+	const confirmDelete = () => {
 		if (window.confirm("Are you sure you want to delete this post?"))
 		{
 			toggleMenu(false)

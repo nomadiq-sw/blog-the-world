@@ -41,7 +41,7 @@ const SimpleMap = () => {
 			const lat = e.geometry.location.lat()
 			const lng = e.geometry.location.lng()
 			gmap.setCenter({lat, lng})
-			gmap.setZoom(12)
+			gmap.setZoom(10)
 		}
 	}, [gmap])
 
