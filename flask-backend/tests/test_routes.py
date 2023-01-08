@@ -476,3 +476,91 @@ def test_delete_post_invalid_id(app, dbx, client, guard, post):
 	assert b'Failed to delete post' in response.data
 	n_posts = dbx.session.query(Post).count()
 	assert n_posts == 1
+
+
+def test_verify_post_unauthenticated(app, dbx, client, unverified_post):
+	response = client.get(
+		'/verify-post/1'
+	)
+	assert response.status_code == 401
+	post = dbx.session.query(Post).get(1)
+	assert post.verified is False
+
+
+def test_verify_post_non_admin_user(app, dbx, client, guard, user, unverified_post):
+	token = guard.encode_jwt_token(user)
+	response = client.get(
+		'/verify-post/1',
+		headers={"Authorization": f"Bearer {token}"}
+	)
+	assert response.status_code == 403
+	post = dbx.session.query(Post).get(1)
+	assert post.verified is False
+
+
+def test_verify_post_admin_user(app, dbx, client, guard, unverified_post):
+	post_orig = dbx.session.query(Post).get(1)
+	assert post_orig.verified is False
+	test_user = User(
+		email='admin@blog-the-world.com',
+		password=guard.hash_password('adminPassword'),
+		roles='admin',
+		is_active=True
+	)
+	dbx.session.add(test_user)
+	dbx.session.commit()
+	admin = dbx.session.query(User).filter_by(roles='admin').one()
+	assert admin is not None
+	token = guard.encode_jwt_token(admin)
+	response = client.get(
+		'/verify-post/1',
+		headers={"Authorization": f"Bearer {token}"}
+	)
+	assert response.status_code == 200
+	assert b'Post verified successfully' in response.data
+	post_new = dbx.session.query(Post).get(1)
+	assert post_new.verified is True
+
+
+def test_verify_post_invalid_id(app, dbx, client, guard, unverified_post):
+	test_user = User(
+		email='admin@blog-the-world.com',
+		password=guard.hash_password('adminPassword'),
+		roles='admin',
+		is_active=True
+	)
+	dbx.session.add(test_user)
+	dbx.session.commit()
+	admin = dbx.session.query(User).filter_by(roles='admin').one()
+	token = guard.encode_jwt_token(admin)
+	response = client.get(
+		'/verify-post/2',
+		headers={"Authorization": f"Bearer {token}"}
+	)
+	assert response.status_code == 404
+	assert b'Failed to verify post' in response.data
+	post = dbx.session.query(Post).get(1)
+	assert post.verified is False
+
+
+def test_verify_post_already_verified(app, dbx, client, guard, post):
+	post_orig = dbx.session.query(Post).get(1)
+	assert post_orig.verified is True
+	test_user = User(
+		email='admin@blog-the-world.com',
+		password=guard.hash_password('adminPassword'),
+		roles='admin',
+		is_active=True
+	)
+	dbx.session.add(test_user)
+	dbx.session.commit()
+	admin = dbx.session.query(User).filter_by(roles='admin').one()
+	token = guard.encode_jwt_token(admin)
+	response = client.get(
+		'/verify-post/1',
+		headers={"Authorization": f"Bearer {token}"}
+	)
+	assert response.status_code == 200
+	assert b'Post verified successfully' in response.data
+	post_new = dbx.session.query(Post).get(1)
+	assert post_new.verified is True

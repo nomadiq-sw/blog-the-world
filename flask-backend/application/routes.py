@@ -24,7 +24,7 @@ logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
 
 def jsonify_message(message):
-	return jsonify({'message': message})
+	return jsonify({"message": message})
 
 
 @api.route("/validate-recaptcha/<token>")
@@ -35,8 +35,8 @@ def validate_recaptcha(token):
 		response = requests.post(
 			"https://www.google.com/recaptcha/api/siteverify",
 			data={
-				'secret': current_app.config.get('RECAPTCHA_SECRET_KEY'),
-				'response': token
+				"secret": current_app.config.get('RECAPTCHA_SECRET_KEY'),
+				"response": token
 			}
 		)
 		data = response.json()
@@ -46,7 +46,7 @@ def validate_recaptcha(token):
 			return jsonify_message("reCAPTCHA validation failed"), 403
 
 
-@api.route("/signup", methods=["POST"])
+@api.route("/signup", methods=['POST'])
 def signup():
 	req = request.get_json(force=True)
 	email = req.get("email", None)
@@ -72,7 +72,7 @@ def signup():
 	return jsonify_message("This e-mail is already in use. Please log in to continue."), 409
 
 
-@api.route('/confirm-signup/<token>')
+@api.route("/confirm-signup/<token>")
 def confirm_signup(token):
 	try:
 		token_user = guard.get_user_from_registration_token(token)
@@ -86,7 +86,7 @@ def confirm_signup(token):
 		return jsonify_message("Invalid token in confirmation URL. Please renew your signup request."), 400
 
 
-@api.route("/login", methods=["POST"])
+@api.route("/login", methods=['POST'])
 def login():
 	"""
 	Logs a user in by parsing a POST request containing user credentials and
@@ -103,7 +103,7 @@ def login():
 	return jsonify(ret), 200
 
 
-@api.route('/forgotten-password', methods=["POST"])
+@api.route("/forgotten-password", methods=['POST'])
 def forgotten_password():
 	req = request.get_json(force=True)
 	email = req.get("email", None)
@@ -125,7 +125,7 @@ def forgotten_password():
 	return jsonify_message("This e-mail is not associated with any user. Please sign up to continue."), 400
 
 
-@api.route('/reset-password/<token>', methods=["POST"])
+@api.route("/reset-password/<token>", methods=['POST'])
 def reset_password(token):
 	try:
 		token_user = guard.validate_reset_token(token)
@@ -226,8 +226,8 @@ def add_post():
 	return jsonify_message("An unexpected error occurred, please try again later"), 400
 
 
-@api.route("/delete-post/<slug>", methods=["DELETE"])
-@roles_required("admin")
+@api.route("/delete-post/<slug>", methods=['DELETE'])
+@roles_required('admin')
 def delete_post(slug=None):
 	try:
 		post_to_delete = db.session.execute(db.select(Post).filter_by(id=slug)).scalar_one()
@@ -237,3 +237,19 @@ def delete_post(slug=None):
 	except (NoResultFound, SQLAlchemyError) as e:
 		logging.error(f'Exception in delete_post: {e}')
 		return jsonify_message('Failed to delete post, please try again later'), 404
+
+
+@api.route("/verify-post/<slug>")
+@roles_required('admin')
+def verify_post(slug=None):
+	try:
+		post_to_verify = db.session.execute(db.select(Post).filter_by(id=slug)).scalar_one()
+		post_to_verify.verified = True
+		logging.info(f'Verifying post {post_to_verify.id}')
+		db.session.commit()
+		p_ver = db.session.execute(db.select(Post).filter_by(id=slug)).scalar_one()
+		logging.info(f'Result: verified = {p_ver.verified}')
+		return jsonify_message("Post verified successfully"), 200
+	except (NoResultFound, SQLAlchemyError) as e:
+		logging.error(f'Exception in verify_post: {e}')
+		return jsonify_message('Failed to verify post, please try again later'), 404
