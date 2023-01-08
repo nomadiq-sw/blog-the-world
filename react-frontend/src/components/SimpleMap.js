@@ -1,4 +1,4 @@
-import {useEffect, useState, useCallback} from 'react'
+import {useEffect, useState, useCallback, useRef} from 'react'
 import GoogleMapReact from 'google-map-react'
 import Marker from './Marker'
 import NewPostMenu from './NewPostMenu'
@@ -11,10 +11,12 @@ const SimpleMap = () => {
 	const [gmap, setGmap] = useState()
 	const [googlemaps, setGooglemaps] = useState()
 	const [pins, setPins] = useState([])
+	const pinsRef = useRef(pins)
 	const defaultCenter = {lat: 20.0, lng: 10.0}
 	const defaultZoom = 2.5
 	const [menuState, setMenuState] = useState(false)
 	const [menuEditPost, setMenuEditPost] = useState(0)
+	const [menuPostVerified, setMenuPostVerified] = useState(false)
 	const [menuPosition, setMenuPosition] = useState({lat: 20.0, lng: 10.0})
 	const [modalShow, setModalShow] = useState(0)
 	const {setToken, getToken, removeToken} = useToken()
@@ -27,9 +29,14 @@ const SimpleMap = () => {
 		  let longitude = parseFloat(ev.latLng.lng().toFixed(5))
 		  let elements = document.querySelectorAll(':hover')
 		  let last = elements.item(elements.length-1)
-		  let regex = /sc-bczRLJ iQVEig marker(\d+)/g
+		  let regex = /sc-bczRLJ irKNdz marker(\d+)/g
 		  let match = regex.exec(last.className)
-		  setMenuEditPost(match ? parseInt(match[1]) : 0)
+		  let editId = match ? parseInt(match[1]) : 0
+		  if (editId !== 0) {
+				let editPin = pinsRef.current.find(item => item.id === editId)
+			  setMenuPostVerified(editPin && editPin.verified)
+		  }
+		  setMenuEditPost(editId)
 		  setMenuPosition({lat: latitude, lng: longitude})
 			setMenuState(true)
 	  })
@@ -66,6 +73,23 @@ const SimpleMap = () => {
 		})
 	}
 
+	const handlePostMenuVerifyClick = () => {
+		const token = getToken()
+		const headers = {'Authorization': `Bearer ${token}`}
+		axios.get(
+			process.env.REACT_APP_FLASK_API_URL + '/verify-post/' + menuEditPost,
+			{
+				headers: headers
+			}
+		).then(
+			(response) => {handlePostUpdate()}
+		).catch((error) => {
+			if (error.response) {
+				window.alert(error.response.data.message)
+			}
+		})
+	}
+
 	useEffect(() => {
 		handlePostUpdate()
 	}, [])
@@ -73,6 +97,7 @@ const SimpleMap = () => {
 	const handlePostUpdate = () => {
 		axios.get(process.env.REACT_APP_FLASK_API_URL + "/posts").then(
 				(response) => {
+					pinsRef.current = response.data
 					setPins(response.data)
 				}
 		).catch(
@@ -115,8 +140,10 @@ const SimpleMap = () => {
 					onClick={() => {setMenuState(false)}}>
 					<NewPostMenu state={menuState}
 					             edit={menuEditPost}
+					             postVerified={menuPostVerified}
 					             handleEditClick={handlePostMenuEditClick}
 					             handleDeleteClick={handlePostMenuDeleteClick}
+					             handleVerifyClick={handlePostMenuVerifyClick}
 					             lat={menuPosition.lat}
 					             lng={menuPosition.lng}/>
 					<NewPostModal modalShow={modalShow}

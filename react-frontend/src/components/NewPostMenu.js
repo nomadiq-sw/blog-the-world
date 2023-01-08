@@ -3,6 +3,7 @@ import {useMenuState} from '@szhsin/react-menu'
 import '@szhsin/react-menu/dist/core.css'
 import {menuSelector, menuItemSelector} from '@szhsin/react-menu/style-utils'
 import styled from 'styled-components'
+import {useEffect} from "react";
 
 const Menu = styled(ControlledMenu)`
   ${menuSelector.name} {
@@ -25,10 +26,10 @@ const Menu = styled(ControlledMenu)`
   }
 `
 
-const NewPostMenu = ({state, edit, handleEditClick, handleDeleteClick}) => {
+const NewPostMenu = ({state, edit, postVerified, handleEditClick, handleDeleteClick, handleVerifyClick}) => {
   const [menuProps, toggleMenu] = useMenuState()
 	const authTokenIsAbsent = () => localStorage.getItem('token') === null
-
+	console.log('rendering menu with edit = ' + edit + ' & editPostVerified = ' + postVerified)
 	toggleMenu(state)
 
 	const confirmDelete = () => {
@@ -36,6 +37,14 @@ const NewPostMenu = ({state, edit, handleEditClick, handleDeleteClick}) => {
 		{
 			toggleMenu(false)
 			handleDeleteClick()
+		}
+	}
+
+	const confirmVerify = () => {
+		if (window.confirm("Are you sure you want to verify this post?"))
+		{
+			toggleMenu(false)
+			handleVerifyClick()
 		}
 	}
 
@@ -53,6 +62,13 @@ const NewPostMenu = ({state, edit, handleEditClick, handleDeleteClick}) => {
 		              aria-label={'Delete post'}>
 			    Delete post
 		    </MenuItem> : null
+			}
+	    {(edit && !postVerified) ?
+				<MenuItem disabled={authTokenIsAbsent()}
+				          onClick={confirmVerify}
+				          aria-label={'Verify post'}>
+					Verify post
+				</MenuItem> : null
 			}
     </Menu>
 	)

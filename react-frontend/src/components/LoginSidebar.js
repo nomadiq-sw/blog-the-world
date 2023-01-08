@@ -132,7 +132,6 @@ const LoginSidebar = (props) => {
     validateForm(event)
     if (validFormRef.current) {
       setFormDisabled(true)
-      console.log("Disabled form")
       await postDataAndTreatResponse(
         process.env.REACT_APP_FLASK_API_URL + "/signup",
         {
@@ -146,7 +145,6 @@ const LoginSidebar = (props) => {
         }
       )
       setFormDisabled(false)
-      console.log("Enabled form")
       clearForm(event)
     }
   }

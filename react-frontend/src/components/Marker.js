@@ -8,7 +8,8 @@ const Wrapper = styled.div`
 	left: 50%;
 	width: 14px;
 	height: 14px;
-	background-color: var(--bs-primary);
+	opacity: ${(props) => (props.verified ? 1.0 : 0.4)};
+	background-color: ${(props) => (props.verified ? 'var(--bs-primary)' : 'var(--bs-secondary)')};
 	border: 2px solid #fff;
 	border-radius: 100%;
 	user-select: none;
@@ -23,7 +24,7 @@ const Marker = ({post}) => {
 
 	return (
 		<div>
-      <Wrapper className={'marker' + post.id}/>
+      <Wrapper verified={post.verified} className={'marker' + post.id}/>
 			<PostPopup post={post} trigger={<Wrapper className={'marker' + post.id}/>}/>
 		</div>
 	)
