@@ -29,7 +29,6 @@ const Menu = styled(ControlledMenu)`
 const NewPostMenu = ({state, edit, postVerified, handleEditClick, handleDeleteClick, handleVerifyClick}) => {
   const [menuProps, toggleMenu] = useMenuState()
 	const authTokenIsAbsent = () => localStorage.getItem('token') === null
-	console.log('rendering menu with edit = ' + edit + ' & editPostVerified = ' + postVerified)
 	toggleMenu(state)
 
 	const confirmDelete = () => {
