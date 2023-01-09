@@ -14,11 +14,6 @@ def create_app(test_config=None):
 		DATABASE=os.path.join(app.instance_path, 'project.db'),
 	)
 
-	@app.after_request
-	def after_request(response):
-		response.headers['Access-Control-Allow-Origin'] = "http://localhost:3000"
-		return response
-
 	if test_config is None:
 		app.config.from_pyfile('config.py', silent=True)
 	else:
@@ -33,7 +28,7 @@ def create_app(test_config=None):
 	Migrate(app, db)
 
 	guard.init_app(app, User)
-	cors.init_app(app)
+	cors.init_app(app, resources={r'*': {'origins': 'http://localhost:3000'}})
 
 	Mail(app)
 
