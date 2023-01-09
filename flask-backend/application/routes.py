@@ -210,7 +210,7 @@ def add_post():
 			post.latitude = data.get('latitude')
 			post.longitude = data.get('longitude')
 			post.user = user_id
-			post.verified = False
+			post.verified = 'admin' in user.rolenames
 			if is_update:
 				db.session.merge(post)
 				message = "Post details updated successfully!"

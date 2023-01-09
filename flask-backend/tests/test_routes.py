@@ -336,11 +336,11 @@ def test_add_post_invalid_trip_string(app, dbx, client, guard, user, post_detail
 
 
 def test_update_existing_post(app, dbx, client, guard, user, post, post_details):
-	orig_post = dbx.session.query(Post).get(1)
-	assert orig_post is not None
-	assert orig_post.title == post_details['title']
-	assert orig_post.trip == post_details['trip']
-	assert orig_post.verified is True
+	post_orig = dbx.session.query(Post).get(1)
+	assert post_orig is not None
+	assert post_orig.title == post_details['title']
+	assert post_orig.trip == post_details['trip']
+	assert post_orig.verified is True
 	token = guard.encode_jwt_token(user)
 	response = client.post(
 		'/add-post',
@@ -358,11 +358,37 @@ def test_update_existing_post(app, dbx, client, guard, user, post, post_details)
 	)
 	assert response.status_code == 201
 	assert b"Post details updated successfully" in response.data
-	post = dbx.session.query(Post).get(1)
-	assert post is not None
-	assert post.title == "An Updated Post Title"
-	assert post.trip == post_details['trip']
-	assert post.verified is False
+	post_new = dbx.session.query(Post).get(1)
+	assert post_new is not None
+	assert post_new.title == "An Updated Post Title"
+	assert post_new.trip == post_details['trip']
+	assert post_new.verified is False
+
+
+def test_update_existing_post_admin(app, dbx, client, guard, admin_user, post, post_details):
+	post_orig = dbx.session.query(Post).get(1)
+	assert post_orig.verified is True
+	token = guard.encode_jwt_token(admin_user)
+	response = client.post(
+		'/add-post',
+		headers={"Authorization": f"Bearer {token}"},
+		json={
+			"update_id": 1,
+			"title": "An Updated Post Title",
+			"url": post_details['url'],
+			"language": post_details['language'].value,
+			"traveler": post_details['traveler'].value,
+			"trip": [tt.name for tt in post_details['trip']],
+			"latitude": post_details['latitude'],
+			"longitude": post_details['longitude']
+		}
+	)
+	assert response.status_code == 201
+	assert b"Post details updated successfully" in response.data
+	post_new = dbx.session.query(Post).get(1)
+	assert post_new is not None
+	assert post_new.title == "An Updated Post Title"
+	assert post_new.verified is True
 
 
 def test_update_existing_post_invalid_data(app, dbx, client, guard, user, post, post_details):
@@ -383,10 +409,10 @@ def test_update_existing_post_invalid_data(app, dbx, client, guard, user, post, 
 	)
 	assert response.status_code == 400
 	assert b"Error adding or updating post" in response.data
-	post = dbx.session.query(Post).get(1)
-	assert post is not None
-	assert post.title == post_details['title']
-	assert post.verified is True
+	post_new = dbx.session.query(Post).get(1)
+	assert post_new is not None
+	assert post_new.title == post_details['title']
+	assert post_new.verified is True
 
 
 def test_update_existing_post_invalid_id(app, dbx, client, guard, user, post, post_details):
@@ -407,10 +433,10 @@ def test_update_existing_post_invalid_id(app, dbx, client, guard, user, post, po
 	)
 	assert response.status_code == 400
 	assert b"Error adding or updating post" in response.data
-	post = dbx.session.query(Post).get(1)
-	assert post is not None
-	assert post.title == post_details['title']
-	assert post.verified is True
+	post_new = dbx.session.query(Post).get(1)
+	assert post_new is not None
+	assert post_new.title == post_details['title']
+	assert post_new.verified is True
 
 
 def test_delete_post_unauthenticated(app, dbx, client, post):
@@ -433,20 +459,10 @@ def test_delete_post_non_admin_user(app, dbx, client, guard, user, post):
 	assert n_posts == 1
 
 
-def test_delete_post_admin_user(app, dbx, client, guard, post):
+def test_delete_post_admin_user(app, dbx, client, guard, admin_user, post):
 	n_posts_orig = dbx.session.query(Post).count()
 	assert n_posts_orig == 1
-	test_user = User(
-		email='admin@blog-the-world.com',
-		password=guard.hash_password('adminPassword'),
-		roles='admin',
-		is_active=True
-	)
-	dbx.session.add(test_user)
-	dbx.session.commit()
-	admin = dbx.session.query(User).filter_by(roles='admin').one()
-	assert admin is not None
-	token = guard.encode_jwt_token(admin)
+	token = guard.encode_jwt_token(admin_user)
 	response = client.delete(
 		'/delete-post/1',
 		headers={"Authorization": f"Bearer {token}"}
@@ -457,17 +473,8 @@ def test_delete_post_admin_user(app, dbx, client, guard, post):
 	assert n_posts_new == 0
 
 
-def test_delete_post_invalid_id(app, dbx, client, guard, post):
-	test_user = User(
-		email='admin@blog-the-world.com',
-		password=guard.hash_password('adminPassword'),
-		roles='admin',
-		is_active=True
-	)
-	dbx.session.add(test_user)
-	dbx.session.commit()
-	admin = dbx.session.query(User).filter_by(roles='admin').one()
-	token = guard.encode_jwt_token(admin)
+def test_delete_post_invalid_id(app, dbx, client, guard, admin_user, post):
+	token = guard.encode_jwt_token(admin_user)
 	response = client.delete(
 		'/delete-post/2',
 		headers={"Authorization": f"Bearer {token}"}
@@ -498,20 +505,10 @@ def test_verify_post_non_admin_user(app, dbx, client, guard, user, unverified_po
 	assert post.verified is False
 
 
-def test_verify_post_admin_user(app, dbx, client, guard, unverified_post):
+def test_verify_post_admin_user(app, dbx, client, guard, admin_user, unverified_post):
 	post_orig = dbx.session.query(Post).get(1)
 	assert post_orig.verified is False
-	test_user = User(
-		email='admin@blog-the-world.com',
-		password=guard.hash_password('adminPassword'),
-		roles='admin',
-		is_active=True
-	)
-	dbx.session.add(test_user)
-	dbx.session.commit()
-	admin = dbx.session.query(User).filter_by(roles='admin').one()
-	assert admin is not None
-	token = guard.encode_jwt_token(admin)
+	token = guard.encode_jwt_token(admin_user)
 	response = client.get(
 		'/verify-post/1',
 		headers={"Authorization": f"Bearer {token}"}
@@ -522,17 +519,8 @@ def test_verify_post_admin_user(app, dbx, client, guard, unverified_post):
 	assert post_new.verified is True
 
 
-def test_verify_post_invalid_id(app, dbx, client, guard, unverified_post):
-	test_user = User(
-		email='admin@blog-the-world.com',
-		password=guard.hash_password('adminPassword'),
-		roles='admin',
-		is_active=True
-	)
-	dbx.session.add(test_user)
-	dbx.session.commit()
-	admin = dbx.session.query(User).filter_by(roles='admin').one()
-	token = guard.encode_jwt_token(admin)
+def test_verify_post_invalid_id(app, dbx, client, guard, admin_user, unverified_post):
+	token = guard.encode_jwt_token(admin_user)
 	response = client.get(
 		'/verify-post/2',
 		headers={"Authorization": f"Bearer {token}"}
@@ -543,19 +531,10 @@ def test_verify_post_invalid_id(app, dbx, client, guard, unverified_post):
 	assert post.verified is False
 
 
-def test_verify_post_already_verified(app, dbx, client, guard, post):
+def test_verify_post_already_verified(app, dbx, client, guard, admin_user, post):
 	post_orig = dbx.session.query(Post).get(1)
 	assert post_orig.verified is True
-	test_user = User(
-		email='admin@blog-the-world.com',
-		password=guard.hash_password('adminPassword'),
-		roles='admin',
-		is_active=True
-	)
-	dbx.session.add(test_user)
-	dbx.session.commit()
-	admin = dbx.session.query(User).filter_by(roles='admin').one()
-	token = guard.encode_jwt_token(admin)
+	token = guard.encode_jwt_token(admin_user)
 	response = client.get(
 		'/verify-post/1',
 		headers={"Authorization": f"Bearer {token}"}

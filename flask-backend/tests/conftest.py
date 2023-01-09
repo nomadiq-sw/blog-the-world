@@ -59,8 +59,22 @@ def user(app, dbx, guard, user_details):
 	)
 	dbx.session.add(test_user)
 	dbx.session.commit()
-	user = dbx.session.execute(dbx.select(User).filter_by(email=user_details['email'])).one()[0]
+	user = dbx.session.execute(dbx.select(User).filter_by(email=user_details['email'])).scalar_one()
 	return user
+
+
+@pytest.fixture()
+def admin_user(app, dbx, guard, user_details):
+	test_user = User(
+		email='admin@blog-the-world.net',
+		password=guard.hash_password('AdminPassword'),
+		roles='admin',
+		is_active=True
+	)
+	dbx.session.add(test_user)
+	dbx.session.commit()
+	admin_user = dbx.session.execute(dbx.select(User).filter_by(email='admin@blog-the-world.net')).scalar_one()
+	return admin_user
 
 
 @pytest.fixture()
