@@ -227,7 +227,14 @@ const LoginSidebar = (props) => {
               </InputGroup>
             </FormGroup>
             <span className="text-black-50">
-              By registering, you accept the terms & conditions and privacy policy.
+              By registering, you accept the&nbsp;
+                <a href='/terms-conditions' target='_blank'>
+                  terms & conditions
+                </a>
+              &nbsp;and&nbsp;
+                <a href='/privacy-policy' target='_blank'>
+                  privacy policy
+                </a>
             </span><br className="mb-2"/>
             <div className="container g-0">
               <div className="row justify-content-start g-0">

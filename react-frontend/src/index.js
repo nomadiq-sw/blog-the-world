@@ -6,8 +6,11 @@ import {
 } from 'react-router-dom'
 import './index.css'
 import App from './App'
+import PageLayout from './PageLayout'
 import PasswordResetModal, {loader as resetTokenLoader} from './components/PasswordResetModal'
 import ConfirmSignupModal, {loader as signupTokenLoader} from './components/ConfirmSignupModal'
+import TermsConditionsPage from './components/TermsConditionsPage'
+import PrivacyPolicyPage from './components/PrivacyPolicyPage'
 import reportWebVitals from './reportWebVitals'
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css'
 
@@ -25,9 +28,22 @@ const router = createBrowserRouter([
 				path: "confirm-signup/:token",
 				element: <ConfirmSignupModal/>,
 				loader: signupTokenLoader
-			}
+			},
 		]
-	}
+	},
+	{
+		element: <PageLayout/>,
+		children: [
+			{
+				path: 'terms-conditions',
+				element: <TermsConditionsPage/>
+			},
+			{
+				path: 'privacy-policy',
+				element: <PrivacyPolicyPage/>
+			},
+		]
+	},
 ])
 
 const recaptcha_script = document.createElement('script')
