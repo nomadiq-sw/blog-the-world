@@ -23,7 +23,7 @@ const PostPopup = ({post, trigger}) => {
 				<span>
 					<a style={{ fontWeight: 'bold', fontSize: '18px', color: 'white' }}
 					   href={post.url}
-					   target='_blank' rel='noreferrer'>
+					   target='_blank' rel='noopener'>
 						{post.title}
 					</a>
 				</span><br/>
