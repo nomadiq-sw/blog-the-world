@@ -22,7 +22,7 @@ const ConfirmSignupModal = () => {
 	const navigate = useNavigate()
 
 	useEffect(() => {
-		axios.get(process.env.REACT_APP_FLASK_API_URL + "/confirm-signup/" + token).then(
+		axios.patch(process.env.REACT_APP_FLASK_API_URL + "/confirm-signup/" + token).then(
 			(response) => {
 				console.log(response.status)
 				console.log(response.data)

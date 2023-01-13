@@ -93,7 +93,7 @@ def test_signup_confirmation_valid(app, dbx, client, guard, user_details):
 	new_user = User.lookup(user_details['email'])
 	assert new_user is not None
 	token = guard.encode_jwt_token(new_user, bypass_user_check=True, is_registration_token=True)
-	response = client.get(
+	response = client.patch(
 		f'/confirm-signup/{token}'
 	)
 	assert response.status_code == 200
@@ -108,7 +108,7 @@ def test_signup_confirmation_invalid_token(app, dbx, client, guard, user_details
 	assert signup_response.status_code == 201
 	new_user = User.lookup(user_details['email'])
 	token = guard.encode_jwt_token(new_user, bypass_user_check=True, is_reset_token=True)
-	response = client.get(
+	response = client.patch(
 		f'/confirm-signup/{token}'
 	)
 	assert response.status_code == 400
@@ -486,7 +486,7 @@ def test_delete_post_invalid_id(app, dbx, client, guard, admin_user, post):
 
 
 def test_verify_post_unauthenticated(app, dbx, client, unverified_post):
-	response = client.get(
+	response = client.patch(
 		'/verify-post/1'
 	)
 	assert response.status_code == 401
@@ -496,7 +496,7 @@ def test_verify_post_unauthenticated(app, dbx, client, unverified_post):
 
 def test_verify_post_non_admin_user(app, dbx, client, guard, user, unverified_post):
 	token = guard.encode_jwt_token(user)
-	response = client.get(
+	response = client.patch(
 		'/verify-post/1',
 		headers={"Authorization": f"Bearer {token}"}
 	)
@@ -509,7 +509,7 @@ def test_verify_post_admin_user(app, dbx, client, guard, admin_user, unverified_
 	post_orig = dbx.session.query(Post).get(1)
 	assert post_orig.verified is False
 	token = guard.encode_jwt_token(admin_user)
-	response = client.get(
+	response = client.patch(
 		'/verify-post/1',
 		headers={"Authorization": f"Bearer {token}"}
 	)
@@ -521,7 +521,7 @@ def test_verify_post_admin_user(app, dbx, client, guard, admin_user, unverified_
 
 def test_verify_post_invalid_id(app, dbx, client, guard, admin_user, unverified_post):
 	token = guard.encode_jwt_token(admin_user)
-	response = client.get(
+	response = client.patch(
 		'/verify-post/2',
 		headers={"Authorization": f"Bearer {token}"}
 	)
@@ -535,7 +535,7 @@ def test_verify_post_already_verified(app, dbx, client, guard, admin_user, post)
 	post_orig = dbx.session.query(Post).get(1)
 	assert post_orig.verified is True
 	token = guard.encode_jwt_token(admin_user)
-	response = client.get(
+	response = client.patch(
 		'/verify-post/1',
 		headers={"Authorization": f"Bearer {token}"}
 	)

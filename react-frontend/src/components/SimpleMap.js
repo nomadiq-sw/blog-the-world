@@ -76,8 +76,9 @@ const SimpleMap = () => {
 	const handlePostMenuVerifyClick = () => {
 		const token = getToken()
 		const headers = {'Authorization': `Bearer ${token}`}
-		axios.get(
+		axios.patch(
 			process.env.REACT_APP_FLASK_API_URL + '/verify-post/' + menuEditPost,
+			null,
 			{
 				headers: headers
 			}

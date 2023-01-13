@@ -55,11 +55,13 @@ def signup():
 		new_user = User(email=email, password=guard.hash_password(password))
 		db.session.add(new_user)
 		db.session.commit()
+		token = guard.encode_jwt_token(new_user, bypass_user_check=True, is_registration_token=True)
+		logging.info(f'token = {token}')
 		html = render_template(
 			"signup_confirmation_email.html",
 			domain=current_app.config.get('DOMAIN'),
 			confirmation_uri=current_app.config.get('PRAETORIAN_CONFIRMATION_URI'),
-			token=guard.encode_jwt_token(new_user, bypass_user_check=True, is_registration_token=True)
+			token=token
 		)
 		guard.send_registration_email(
 			email,
@@ -72,7 +74,7 @@ def signup():
 	return jsonify_message("This e-mail is already in use. Please log in to continue."), 409
 
 
-@api.route("/confirm-signup/<token>")
+@api.route("/confirm-signup/<token>", methods=['PATCH'])
 def confirm_signup(token):
 	try:
 		token_user = guard.get_user_from_registration_token(token)
@@ -239,7 +241,7 @@ def delete_post(slug=None):
 		return jsonify_message('Failed to delete post, please try again later'), 404
 
 
-@api.route("/verify-post/<slug>")
+@api.route("/verify-post/<slug>", methods=['PATCH'])
 @roles_required('admin')
 def verify_post(slug=None):
 	try:
