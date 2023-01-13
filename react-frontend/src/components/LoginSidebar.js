@@ -230,11 +230,11 @@ const LoginSidebar = (props) => {
               By registering, you accept the&nbsp;
                 <a href='/terms-conditions' target='_blank'>
                   terms & conditions
-                </a>
-              &nbsp;and&nbsp;
+                </a><br/>
+              and&nbsp;
                 <a href='/privacy-policy' target='_blank'>
                   privacy policy
-                </a>
+                </a>.
             </span><br className="mb-2"/>
             <div className="container g-0">
               <div className="row justify-content-start g-0">
