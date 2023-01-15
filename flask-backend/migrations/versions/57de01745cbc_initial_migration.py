@@ -1,8 +1,8 @@
-"""Initial migration
+"""initial_migration
 
-Revision ID: ab0a40e52790
+Revision ID: 57de01745cbc
 Revises: 
-Create Date: 2022-10-07 11:23:56.114110
+Create Date: 2023-01-15 16:26:49.942920
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'ab0a40e52790'
+revision = '57de01745cbc'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -34,7 +34,7 @@ def upgrade():
     sa.Column('language', sa.Enum('AR', 'DE', 'EN', 'ES', 'FA', 'FR', 'IT', 'JP', 'NL', 'PL', 'PT', 'RU', 'TR', 'VI', 'ZH', name='languages'), nullable=False),
     sa.Column('url', sa.String(length=2048), nullable=False),
     sa.Column('date', sa.Date(), nullable=False),
-    sa.Column('traveler', sa.Enum('Solo', 'Couple', 'Family', 'Group', name='travelertypes'), nullable=True),
+    sa.Column('traveler', sa.Enum('Couple', 'Family', 'Friends', 'Group', 'Solo', name='travelertypes'), nullable=True),
     sa.Column('trip', sa.PickleType(), nullable=True),
     sa.Column('latitude', sa.Float(), nullable=False),
     sa.Column('longitude', sa.Float(), nullable=False),

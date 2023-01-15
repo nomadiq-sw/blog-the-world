@@ -22,10 +22,6 @@ def create_app(test_config=None):
 	app = Flask(__name__, instance_relative_config=True)
 	app.register_blueprint(api)
 
-	app.config.from_mapping(
-		DATABASE=os.path.join(app.instance_path, 'project.db'),
-	)
-
 	if test_config is None:
 		app.config.from_pyfile('config.py', silent=True)
 	else:
