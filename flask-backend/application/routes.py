@@ -259,10 +259,7 @@ def verify_post(slug=None):
 	try:
 		post_to_verify = db.session.execute(db.select(Post).filter_by(id=slug)).scalar_one()
 		post_to_verify.verified = True
-		logging.info(f'Verifying post {post_to_verify.id}')
 		db.session.commit()
-		p_ver = db.session.execute(db.select(Post).filter_by(id=slug)).scalar_one()
-		logging.info(f'Result: verified = {p_ver.verified}')
 		return jsonify_message("Post verified successfully"), 200
 	except (NoResultFound, SQLAlchemyError) as e:
 		logging.error(f'Exception in verify_post: {e}')
