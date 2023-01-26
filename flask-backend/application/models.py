@@ -16,7 +16,7 @@ from sqlalchemy.ext.mutable import MutableSet
 from sqlalchemy_serializer import SerializerMixin
 from sqlalchemy.orm import validates
 
-db = SQLAlchemy()
+db = SQLAlchemy(engine_options={'pool_pre_ping': True})
 
 
 class Languages(str, enum.Enum):
