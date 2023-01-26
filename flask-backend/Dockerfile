@@ -1,10 +1,19 @@
 FROM python:3.10-alpine
 
-WORKDIR /usr/src/app
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
 
-COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --upgrade pip
 
-COPY . .
+RUN adduser -D appuser
+USER appuser
+WORKDIR /home/appuser/app
 
-CMD [ "python", "-m", "flask", "--app=application", "run", "--host=0.0.0.0" ]
+COPY --chown=appuser:appuser requirements.txt ./
+RUN pip install --user --no-cache-dir -r requirements.txt
+
+ENV PATH="/home/appuser/.local/bin:${PATH}"
+
+COPY --chown=appuser:appuser . .
+
+CMD [ "gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "application:create_app()", "--access-logfile=-" ]
