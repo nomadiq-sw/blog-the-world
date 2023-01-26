@@ -1,0 +1,12 @@
+services:
+  web:
+    build: flask-backend
+    command: gunicorn -w 4 -b 0.0.0.0:5000 application:create_app\(\) --access-logfile=-
+    expose:
+      - 5000
+  nginx:
+    build: nginx
+    ports:
+      - 8080:80
+    depends_on:
+      - web
