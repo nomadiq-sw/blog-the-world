@@ -84,7 +84,7 @@ const LoginSidebar = (props) => {
     event.preventDefault()
   }
 
-  const postDataAndTreatResponse = async (url, data, successCallback) => {
+  const postDataAndTreatResponse = async (url, data, successCallback, cleanupCallback) => {
     return validateRecaptcha(validFormRef).then((recaptchaValid) => {
       if (recaptchaValid) {
         axios.post(url, data).then((response) => {
@@ -99,6 +99,8 @@ const LoginSidebar = (props) => {
             setSuccessShow(false)
             setErrorShow(true)
           }
+        }).finally(() => {
+          cleanupCallback()
         })
       }
       else {
@@ -133,10 +135,12 @@ const LoginSidebar = (props) => {
             setLoggedIn(true)
             handleClose()
           }
+        },
+        () => {
+          setFormDisabled(false)
+          clearForm(event)
         }
       )
-      setFormDisabled(false)
-      clearForm(event)
     }
   }
 
@@ -154,10 +158,12 @@ const LoginSidebar = (props) => {
           setSuccessContent(response.data.message)
           setErrorShow(false)
           setSuccessShow(true)
+        },
+        () => {
+          setFormDisabled(false)
+          clearForm(event)
         }
       )
-      setFormDisabled(false)
-      clearForm(event)
     }
   }
 
@@ -176,10 +182,12 @@ const LoginSidebar = (props) => {
           setSuccessContent(response.data.message)
           setErrorShow(false)
           setSuccessShow(true)
+        },
+        () => {
+          setFormDisabled(false)
+          clearForm(event)
         }
       )
-      setFormDisabled(false)
-      clearForm(event)
     }
   }
 
