@@ -41,7 +41,7 @@ const SimpleMap = () => {
 		  let longitude = parseFloat(ev.latLng.lng().toFixed(5))
 		  let elements = document.querySelectorAll(':hover')
 		  let last = elements.item(elements.length-1)
-		  let regex = /sc-bczRLJ irKNdz marker(\d+)/g
+		  let regex = /sc-bczRLJ \w+ marker(\d+)/g
 		  let match = regex.exec(last.className)
 		  let editId = match ? parseInt(match[1]) : 0
 		  if (editId !== 0) {

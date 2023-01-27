@@ -10,3 +10,8 @@ services:
       - 8080:80
     depends_on:
       - web
+  react:
+    build: react-frontend
+    command: nginx -g 'daemon off;'
+    ports:
+      - 3000:80

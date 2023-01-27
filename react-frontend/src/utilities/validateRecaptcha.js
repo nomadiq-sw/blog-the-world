@@ -16,8 +16,10 @@ const validateRecaptcha = (formValidityRef) => {
   if (formValidityRef.current) {
     return (
       Promise.resolve(
+        // eslint-disable-next-line no-undef
         () => grecaptcha.ready()
       ).then(
+        // eslint-disable-next-line no-undef
 				() => grecaptcha.execute(process.env.REACT_APP_RECAPTCHA_SITE_KEY, {action: 'submit'})
       ).then(
         (token) => axios.get(process.env.REACT_APP_FLASK_API_URL + '/validate-recaptcha/' + token)
