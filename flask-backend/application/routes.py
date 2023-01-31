@@ -68,7 +68,7 @@ def signup():
 		db.session.add(new_user)
 		db.session.commit()
 		token = guard.encode_jwt_token(new_user, bypass_user_check=True, is_registration_token=True)
-		logging.info(f'token = {token}')
+		logging.info(f'Registration token for {email} = {token}')
 		html = render_template(
 			"signup_confirmation_email.html",
 			domain=current_app.config.get('DOMAIN'),
@@ -183,7 +183,6 @@ def posts(
 				Post.id == slug,
 				Post.date > cutoff_date)
 			).scalar_one()
-			# Ignore warning about access to protected member, this is from the NamedTuple API:
 			post_dict = post.to_dict()
 			post_dict['trip'] = [tt.name for tt in post_dict['trip']]
 			if not include_unverified and not post_dict['verified']:
