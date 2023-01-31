@@ -164,8 +164,8 @@ def posts(
 	if slug is None:
 		if include_unverified:
 			all_posts = db.session.execute(db.select(Post).filter(
-				Post.date > cutoff_date)
-			).scalars()
+				Post.date > cutoff_date
+			)).scalars()
 		else:
 			all_posts = db.session.execute(db.select(Post).filter(
 				Post.date > cutoff_date,
@@ -181,8 +181,8 @@ def posts(
 		try:
 			post = db.session.execute(db.select(Post).filter(
 				Post.id == slug,
-				Post.date > cutoff_date)
-			).scalar_one()
+				Post.date > cutoff_date
+			)).scalar_one()
 			post_dict = post.to_dict()
 			post_dict['trip'] = [tt.name for tt in post_dict['trip']]
 			if not include_unverified and not post_dict['verified']:
