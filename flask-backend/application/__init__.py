@@ -9,7 +9,7 @@
 # of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
 #
 # You should have received a copy of the GNU Affero General Public License along with BlogTheWorld. If not, see <https://www.gnu.org/licenses/>.
-
+import logging
 import os
 from flask import Flask
 from flask_migrate import Migrate
@@ -24,8 +24,10 @@ def create_app(test_config=None):
 
 	if test_config is None:
 		app.config.from_pyfile('config.py', silent=True)
+		logging.info("Running with full config")
 	else:
 		app.config.from_pyfile(test_config)
+		logging.info("Running with test config")
 
 	try:
 		os.makedirs(app.instance_path)
