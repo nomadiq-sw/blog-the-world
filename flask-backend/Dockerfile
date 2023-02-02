@@ -15,3 +15,5 @@ RUN pip install --user --no-cache-dir -r requirements.txt
 ENV PATH="/home/appuser/.local/bin:${PATH}"
 
 COPY --chown=appuser:appuser . .
+
+CMD ["gunicorn", "-w 4", "-b 0.0.0.0:5000", "application:create_app()", "--access-logfile=-"]
