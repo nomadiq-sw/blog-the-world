@@ -19,7 +19,7 @@ from .routes import api, guard, cors
 
 
 def create_app(test_config=None):
-	app = Flask(__name__, instance_relative_config=True)
+	app = Flask(__name__, instance_relative_config=False)
 	app.register_blueprint(api)
 
 	if test_config is None:

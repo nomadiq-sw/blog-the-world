@@ -1,0 +1,25 @@
+from urllib.parse import urljoin
+from os import getenv
+
+TESTING = False
+SECRET_KEY = getenv('SECRET_KEY')
+RECAPTCHA_SECRET_KEY = getenv('RECAPTCHA_SECRET_KEY')
+BASE_URL = "https://blogtheworld.co"
+DOMAIN = "blogtheworld.co"
+
+SQLALCHEMY_DATABASE_URI = getenv('SQLALCHEMY_DATABASE_URI')
+SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+JWT_ACCESS_LIFESPAN = {"hours": 48}
+JWT_REFRESH_LIFESPAN = {"days": 30}
+
+DEFAULT_MAIL_SENDER = "noreply@blogtheworld.co"
+MAIL_SERVER = "smtp.sendgrid.net"
+MAIL_PORT = 587
+MAIL_USE_TLS = True
+MAIL_USERNAME = 'apikey'
+MAIL_PASSWORD = getenv('SENDGRID_API_KEY')
+PRAETORIAN_CONFIRMATION_SENDER = DEFAULT_MAIL_SENDER
+PRAETORIAN_RESET_SENDER = DEFAULT_MAIL_SENDER
+PRAETORIAN_CONFIRMATION_URI = urljoin(BASE_URL, "confirm-signup")
+PRAETORIAN_RESET_URI = urljoin(BASE_URL, "reset-password")

@@ -1,2 +1,5 @@
 .pytest_cache
 venv
+migrations
+tests
+application/test_config.py
