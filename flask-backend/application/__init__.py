@@ -38,7 +38,7 @@ def create_app(test_config=None):
 	Migrate(app, db)
 
 	guard.init_app(app, User)
-	cors.init_app(app, resources={r'*': {'origins': 'http://localhost:3000'}})
+	cors.init_app(app, resources={r'*': {'origins': ['http://localhost:3000', 'https://blogtheworld.co']}})
 
 	Mail(app)
 
