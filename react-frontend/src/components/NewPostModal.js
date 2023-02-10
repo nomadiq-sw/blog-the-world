@@ -228,6 +228,8 @@ const NewPostModal = ({modalShow, postId, initLat, initLng, handlePostUpdate}) =
 		}
 	}
 
+	const tripTypeChecks = optionChecks(Trip, tripCheckboxState, tripTypeCheckHandler)
+
 	return (
 		<Modal show={show} onHide={handleClose}>
 			<ModalHeader closeButton>
@@ -277,16 +279,16 @@ const NewPostModal = ({modalShow, postId, initLat, initLng, handlePostUpdate}) =
 					<FormGroup className='mb-2' controlId='formGroupTrip'>
 						<FormLabel className='fw-semibold'>Trip type</FormLabel>
 						<Row>
-							{optionChecks(Trip, tripCheckboxState, tripTypeCheckHandler).slice(0, 3)}
+							{tripTypeChecks.slice(0, 3)}
 						</Row>
 						<Row>
-							{optionChecks(Trip, tripCheckboxState, tripTypeCheckHandler).slice(3, 6)}
+							{tripTypeChecks.slice(3, 6)}
 						</Row>
 						<Row>
-							{optionChecks(Trip, tripCheckboxState, tripTypeCheckHandler).slice(6, 9)}
+							{tripTypeChecks.slice(6, 9)}
 						</Row>
 						<Row>
-							{optionChecks(Trip, tripCheckboxState, tripTypeCheckHandler).slice(9,12)}
+							{tripTypeChecks.slice(9,12)}
 						</Row>
 					</FormGroup>
 					<Row>

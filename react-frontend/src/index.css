@@ -29,3 +29,7 @@ code {
 	bottom: 30px !important;
 	z-index: 9;
 }
+
+.dropdown-toggle::after {
+  display: none !important;
+}

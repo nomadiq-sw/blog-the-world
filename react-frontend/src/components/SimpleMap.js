@@ -16,6 +16,7 @@ import Marker from './Marker'
 import NewPostMenu from './NewPostMenu'
 import NewPostModal from './NewPostModal'
 import SearchBox from './SearchBox'
+import FilterMenu from './FilterMenu'
 import axios from "axios";
 import useToken from '../utilities/useToken'
 
@@ -126,6 +127,9 @@ const SimpleMap = () => {
 				<SearchBox maps={googlemaps}
 				           onPlaceChanged={handleOnPlaceChanged}
 				           placeholder='Find location...'/>
+			</div>
+			<div style={{zIndex:'9'}} className='position-absolute w-auto top-0 end-0 px-2 py-3'>
+				<FilterMenu/>
 			</div>
 			<div style={{zIndex:'1'}} className='position-absolute w-100 h-100'>
 				<GoogleMapReact style={{position:'absolute', height:'100%', width:'100%'}}
