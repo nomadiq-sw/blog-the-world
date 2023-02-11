@@ -17,8 +17,10 @@ import NewPostMenu from './NewPostMenu'
 import NewPostModal from './NewPostModal'
 import SearchBox from './SearchBox'
 import FilterMenu from './FilterMenu'
+import {Language} from '../utilities/enums'
 import axios from "axios";
 import useToken from '../utilities/useToken'
+import {forEach} from "react-bootstrap/ElementChildren";
 
 const SimpleMap = () => {
 	const [gmap, setGmap] = useState()
@@ -121,6 +123,13 @@ const SimpleMap = () => {
 		)
 	}
 
+	const langFilterApply = (langFilterList) => {
+		const langKeys = Object.keys(Language).filter((key) => langFilterList.get(key))
+		const langVals = langKeys.map(k => Language[k])
+		let fPins = pinsRef.current.filter(p => langVals.includes(p.language))
+		setPins(fPins)
+	}
+
 	return (
 		<div className='position-relative h-100 w-100'>
 			<div style={{zIndex:'9'}} className='position-absolute w-auto top-0 start-0 px-1 py-3'>
@@ -129,7 +138,7 @@ const SimpleMap = () => {
 				           placeholder='Find location...'/>
 			</div>
 			<div style={{zIndex:'9'}} className='position-absolute w-auto top-0 end-0 px-2 py-3'>
-				<FilterMenu/>
+				<FilterMenu langFilterCallback={langFilterApply}/>
 			</div>
 			<div style={{zIndex:'1'}} className='position-absolute w-100 h-100'>
 				<GoogleMapReact style={{position:'absolute', height:'100%', width:'100%'}}

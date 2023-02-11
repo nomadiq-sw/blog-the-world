@@ -7,9 +7,10 @@ import {
 } from 'react-bootstrap'
 import {BsFilterRight} from 'react-icons/bs'
 import {Language} from '../utilities/enums'
-import {useReducer} from "react";
+import {useReducer, useState} from "react";
 
-const FilterMenu = () => {
+const FilterMenu = ({langFilterCallback}) => {
+	const [langAllState, setLangAllState] = useState('All')
 	const langList = Object.entries(Language).sort((a, b) => a[1].localeCompare(b[1]))
 
 	const langReducer = (state, action) => {
@@ -30,6 +31,13 @@ const FilterMenu = () => {
 
 	const langCheckChange = (e) => {
 		langDispatch({type: 'toggle', lang: e.target.name, payload: e.target.checked})
+	}
+
+	const changeLangAllState = () => {
+		for (const [lk, ] of langList) {
+			langDispatch({type: 'toggle', lang: lk, payload: (langAllState === 'All')})
+		}
+		setLangAllState(langAllState === 'All' ? 'None' : 'All')
 	}
 
 	const checkRows = (checkList, checkArray, onChangeFunction) => {
@@ -64,7 +72,24 @@ const FilterMenu = () => {
 						<Dropdown.Menu>
 							<Form>
 								{checkRows(langList, langChecked, langCheckChange)}
-								<Button type='button' className='btn-primary mx-3' onClick={() => {}}>Apply</Button>
+		            <div className="container g-0">
+		              <div className="row justify-content-center g-0">
+		                <div className="col-5 me-1">
+											<Button type='button'
+											        className='btn-primary w-100'
+											        onClick={() => langFilterCallback(langChecked)}>
+												Apply
+											</Button>
+		                </div>
+			              <div className='col-5'>
+											<Button type='button'
+											        className='btn-secondary w-100'
+											        onClick={changeLangAllState}>
+												{langAllState}
+											</Button>
+			              </div>
+		              </div>
+		            </div>
 							</Form>
 						</Dropdown.Menu>
 					</Dropdown>
