@@ -17,10 +17,9 @@ import NewPostMenu from './NewPostMenu'
 import NewPostModal from './NewPostModal'
 import SearchBox from './SearchBox'
 import FilterMenu from './FilterMenu'
-import {Language} from '../utilities/enums'
-import axios from "axios";
+import {Language, Traveler, Trip} from '../utilities/enums'
+import axios from 'axios'
 import useToken from '../utilities/useToken'
-import {forEach} from "react-bootstrap/ElementChildren";
 
 const SimpleMap = () => {
 	const [gmap, setGmap] = useState()
@@ -28,6 +27,8 @@ const SimpleMap = () => {
 	const [pins, setPins] = useState([])
 	const pinsRef = useRef(pins)
 	const [langFilter, setLangFilter] = useState()
+	const [travelerFilter, setTravelerFilter] = useState()
+	const [tripFilter, setTripFilter] = useState()
 	const defaultCenter = {lat: 20.0, lng: 10.0}
 	const defaultZoom = 2.5
 	const [menuState, setMenuState] = useState(false)
@@ -116,10 +117,16 @@ const SimpleMap = () => {
 				(response) => {
 					pinsRef.current = response.data
 					if (langFilter) {
-						console.log("Refreshing posts with language filter")
 						langFilterApply(langFilter)
 					}
+					if (travelerFilter) {
+						travelerFilterApply(travelerFilter)
+					}
+					if (tripFilter) {
+						tripFilterApply(tripFilter)
+					}
 					else {
+						console.log("Showing all posts")
 						setPins(response.data)
 					}
 				}
@@ -130,13 +137,50 @@ const SimpleMap = () => {
 		)
 	}
 
+	const intersect = (first = [], ...rest) => {
+   rest = rest.map(array => new Set(array))
+   return first.filter(e => rest.every(set => set.has(e)))
+	}
+
+	const applyAllFilters = (langFilterList, travelerFilterList, tripFilterList) => {
+		let langPins, travelerPins, tripPins = []
+		let catArray = []
+		if (langFilterList) {
+			const langKeys = Object.keys(Language).filter((key) => langFilterList.get(key))
+			const langVals = langKeys.map(k => Language[k])
+			langPins = pinsRef.current.filter(p => langVals.includes(p.language))
+			catArray.push(langPins)
+		}
+		if (travelerFilterList) {
+			const travelerKeys = Object.keys(Traveler).filter((key) => travelerFilterList.get(key))
+			const travelerVals = travelerKeys.map(k => Traveler[k])
+			travelerPins = pinsRef.current.filter(p => travelerVals.includes(p.traveler))
+			catArray.push(travelerPins)
+		}
+		if (tripFilterList) {
+			const tripKeys = Object.keys(Trip).filter((key) => tripFilterList.get(key))
+			const intersection = (p) => p.trip.filter((t) => tripKeys.includes(t))
+			tripPins = pinsRef.current.filter(p => intersection(p).length)
+			catArray.push(tripPins)
+		}
+		const result = intersect(...catArray)
+		console.log("Found", result.length, "matching pins")
+		setPins(result)
+	}
+
 	const langFilterApply = (langFilterList) => {
-		const langKeys = Object.keys(Language).filter((key) => langFilterList.get(key))
-		const langVals = langKeys.map(k => Language[k])
-		let fPins = pinsRef.current.filter(p => langVals.includes(p.language))
-		console.log("Got", fPins.length, "matching pins")
 		setLangFilter(langFilterList)
-		setPins(fPins)
+		applyAllFilters(langFilterList, travelerFilter, tripFilter)
+	}
+
+	const travelerFilterApply = (travelerFilterList) => {
+		setTravelerFilter(travelerFilterList)
+		applyAllFilters(langFilter, travelerFilterList, tripFilter)
+	}
+
+	const tripFilterApply = (tripFilterList) => {
+		setTripFilter(tripFilterList)
+		applyAllFilters(langFilter, travelerFilter, tripFilterList)
 	}
 
 	return (
@@ -147,7 +191,9 @@ const SimpleMap = () => {
 				           placeholder='Find location...'/>
 			</div>
 			<div style={{zIndex:'9'}} className='position-absolute w-auto top-0 end-0 px-2 py-3'>
-				<FilterMenu langFilterCallback={langFilterApply}/>
+				<FilterMenu langFilterCallback={langFilterApply}
+				            travelerFilterCallback={travelerFilterApply}
+				            tripFilterCallback={tripFilterApply}/>
 			</div>
 			<div style={{zIndex:'1'}} className='position-absolute w-100 h-100'>
 				<GoogleMapReact style={{position:'absolute', height:'100%', width:'100%'}}

@@ -6,18 +6,31 @@ import {
 	Button
 } from 'react-bootstrap'
 import {BsFilterRight} from 'react-icons/bs'
-import {Language} from '../utilities/enums'
-import {useReducer, useState} from "react";
+import {Language, Traveler, Trip} from '../utilities/enums'
+import {useReducer, useState} from 'react'
 
-const FilterMenu = ({langFilterCallback}) => {
+const FilterMenu = ({langFilterCallback, travelerFilterCallback, tripFilterCallback}) => {
 	const [langAllState, setLangAllState] = useState('All')
-	const langList = Object.entries(Language).sort((a, b) => a[1].localeCompare(b[1]))
+	const [travelerAllState, setTravelerAllState] = useState('All')
+	const [tripAllState, setTripAllState] = useState('All')
+	const langList = Object.entries(Language)
+		.sort((a, b) => a[1].localeCompare(b[1]))
+	const travelerList = Object.entries(Traveler)
+		.sort((a, b) => a[1].localeCompare(b[1]))
+	const tripList = Object.entries(Trip)
+		.sort((a, b) => a[1].localeCompare(b[1]))
 
-	const langReducer = (state, action) => {
+	const reducer = (state, action) => {
+		let s = new Map(state)
 		switch (action.type) {
-			case 'toggle':
-				let s = new Map(state)
+			case 'toggle-lang':
 				s.set(action.lang, action.payload)
+				return s
+			case 'toggle-traveler':
+				s.set(action.traveler, action.payload)
+				return s
+			case 'toggle-trip':
+				s.set(action.trip, action.payload)
 				return s
 			default:
 				return state
@@ -25,19 +38,51 @@ const FilterMenu = ({langFilterCallback}) => {
 	}
 
 	const [langChecked, langDispatch] = useReducer(
-		langReducer,
+		reducer,
 		new Map(Object.keys(Language).map((key) => [key, false]))
 	)
 
+	const [travelerChecked, travelerDispatch] = useReducer(
+		reducer,
+		new Map(Object.keys(Traveler).map((key) => [key, false]))
+	)
+
+	const [tripChecked, tripDispatch] = useReducer(
+		reducer,
+		new Map(Object.keys(Trip).map((key) => [key, false]))
+	)
+
 	const langCheckChange = (e) => {
-		langDispatch({type: 'toggle', lang: e.target.name, payload: e.target.checked})
+		langDispatch({type: 'toggle-lang', lang: e.target.name, payload: e.target.checked})
+	}
+
+	const travelerCheckChange = (e) => {
+		travelerDispatch({type: 'toggle-traveler', traveler: e.target.name, payload: e.target.checked})
+	}
+
+	const tripCheckChange = (e) => {
+		tripDispatch({type: 'toggle-trip', trip: e.target.name, payload: e.target.checked})
 	}
 
 	const changeLangAllState = () => {
 		for (const [lk, ] of langList) {
-			langDispatch({type: 'toggle', lang: lk, payload: (langAllState === 'All')})
+			langDispatch({type: 'toggle-lang', lang: lk, payload: (langAllState === 'All')})
 		}
 		setLangAllState(langAllState === 'All' ? 'None' : 'All')
+	}
+
+	const changeTravelerAllState = () => {
+		for (const [tvk, ] of travelerList) {
+			travelerDispatch({type: 'toggle-traveler', traveler: tvk, payload: (travelerAllState === 'All')})
+		}
+		setTravelerAllState(travelerAllState === 'All' ? 'None' : 'All')
+	}
+
+	const changeTripAllState = () => {
+		for (const [trk, ] of tripList) {
+			tripDispatch({type: 'toggle-trip', trip: trk, payload: (tripAllState === 'All')})
+		}
+		setTripAllState(tripAllState === 'All' ? 'None' : 'All')
 	}
 
 	const checkRows = (checkList, checkArray, onChangeFunction) => {
@@ -64,38 +109,58 @@ const FilterMenu = ({langFilterCallback}) => {
 				<BsFilterRight size={24}/>
 			</Dropdown.Toggle>
 			<Dropdown.Menu>
-				<Dropdown.Item>
-					<Dropdown drop='start' autoClose='outside'>
-						<Dropdown.Toggle style={{border:'none', background: 'none', color:'#000'}} className='w-100'>
-							Language
-						</Dropdown.Toggle>
-						<Dropdown.Menu>
-							<Form>
-								{checkRows(langList, langChecked, langCheckChange)}
-		            <div className="container g-0">
-		              <div className="row justify-content-center g-0">
-		                <div className="col-5 me-1">
-											<Button type='button'
-											        className='btn-primary w-100'
-											        onClick={() => langFilterCallback(langChecked)}>
-												Apply
-											</Button>
-		                </div>
-			              <div className='col-5'>
-											<Button type='button'
-											        className='btn-secondary w-100'
-											        onClick={changeLangAllState}>
-												{langAllState}
-											</Button>
-			              </div>
-		              </div>
-		            </div>
-							</Form>
-						</Dropdown.Menu>
-					</Dropdown>
-				</Dropdown.Item>
+				<DropdownCheckboxList label='Language'
+				                      checkFunc={checkRows(langList, langChecked, langCheckChange)}
+				                      filterCallback={() => {langFilterCallback(langChecked)}}
+				                      allStateVar={langAllState}
+				                      allStateFunc={changeLangAllState}/>
+				<DropdownCheckboxList label='Traveler'
+				                      checkFunc={checkRows(travelerList, travelerChecked, travelerCheckChange)}
+				                      filterCallback={() => {travelerFilterCallback(travelerChecked)}}
+				                      allStateVar={travelerAllState}
+				                      allStateFunc={changeTravelerAllState}/>
+				<DropdownCheckboxList label='Trip'
+				                      checkFunc={checkRows(tripList, tripChecked, tripCheckChange)}
+				                      filterCallback={() => {tripFilterCallback(tripChecked)}}
+				                      allStateVar={tripAllState}
+				                      allStateFunc={changeTripAllState}/>
 			</Dropdown.Menu>
 		</Dropdown>
+	)
+}
+
+const DropdownCheckboxList = ({label, checkFunc, filterCallback, allStateVar, allStateFunc}) => {
+	return (
+		<Dropdown.Item>
+			<Dropdown drop='start' autoClose='outside'>
+				<Dropdown.Toggle style={{border:'none', background: 'none', color:'#000'}} className='w-100'>
+					{label}
+				</Dropdown.Toggle>
+				<Dropdown.Menu>
+					<Form>
+						{checkFunc}
+            <div className="container g-0">
+              <div className="row justify-content-center g-0">
+                <div className="col-5 me-1">
+									<Button type='button'
+									        className='btn-primary w-100'
+									        onClick={filterCallback}>
+										Apply
+									</Button>
+                </div>
+	              <div className='col-5'>
+									<Button type='button'
+									        className='btn-secondary w-100'
+									        onClick={allStateFunc}>
+										{allStateVar}
+									</Button>
+	              </div>
+              </div>
+            </div>
+					</Form>
+				</Dropdown.Menu>
+			</Dropdown>
+		</Dropdown.Item>
 	)
 }
 
