@@ -14,6 +14,9 @@ import Popup from 'reactjs-popup'
 
 const PostPopup = ({post, trigger}) => {
 	const dateString = new Date(post.date).toLocaleDateString()
+	const postUrl = new URL(post.url)
+	const postBaseUrl = postUrl.protocol + postUrl.hostname
+	const postDomain = postUrl.hostname.replace('www', '')
 
 	return (
 		<Popup trigger={trigger}
@@ -38,6 +41,9 @@ const PostPopup = ({post, trigger}) => {
 					   target='_blank' rel='noopener'>
 						{post.title}
 					</a>
+				</span><br/>
+				<span style={{ fontStyle: 'italic' }}>
+					By <a style={{ color: 'white' }} href={postBaseUrl} target='_blank' rel='noopener'>{postDomain}</a>
 				</span><br/>
 				<span>Added on {dateString}</span>
 			</div>
