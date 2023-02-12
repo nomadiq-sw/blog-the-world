@@ -27,6 +27,7 @@ const SimpleMap = () => {
 	const [googlemaps, setGooglemaps] = useState()
 	const [pins, setPins] = useState([])
 	const pinsRef = useRef(pins)
+	const [langFilter, setLangFilter] = useState()
 	const defaultCenter = {lat: 20.0, lng: 10.0}
 	const defaultZoom = 2.5
 	const [menuState, setMenuState] = useState(false)
@@ -114,7 +115,13 @@ const SimpleMap = () => {
 		axios.get(process.env.REACT_APP_FLASK_API_URL + "/posts").then(
 				(response) => {
 					pinsRef.current = response.data
-					setPins(response.data)
+					if (langFilter) {
+						console.log("Refreshing posts with language filter")
+						langFilterApply(langFilter)
+					}
+					else {
+						setPins(response.data)
+					}
 				}
 		).catch(
 				(err) => {
@@ -127,6 +134,8 @@ const SimpleMap = () => {
 		const langKeys = Object.keys(Language).filter((key) => langFilterList.get(key))
 		const langVals = langKeys.map(k => Language[k])
 		let fPins = pinsRef.current.filter(p => langVals.includes(p.language))
+		console.log("Got", fPins.length, "matching pins")
+		setLangFilter(langFilterList)
 		setPins(fPins)
 	}
 
