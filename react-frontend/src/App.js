@@ -14,6 +14,7 @@ import SimpleMap from './components/SimpleMap'
 import LoginSidebar from './components/LoginSidebar'
 import {Outlet} from 'react-router-dom'
 import './App.css'
+import SplashScreenModal from './components/SplashScreenModal'
 
 const App = () => {
 
@@ -24,6 +25,7 @@ const App = () => {
 				<LoginSidebar placement='end'/>
 			</header>
 			<div className='map-container' style={{ height: '94vh', width: '100%' }}>
+				{localStorage.getItem('splashScreenDismissed') ? null : <SplashScreenModal/>}
 				<Outlet/>
 				<SimpleMap/>
 			</div>

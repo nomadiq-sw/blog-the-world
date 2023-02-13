@@ -22,8 +22,8 @@ const TermsConditionsPage = () => {
 						<p className="text-start">
 							These Terms and Conditions constitute a legally binding agreement between you ('you', 'your') as the user
 							of the website&#8201;
-							<a className="link hover:font-semibold" href='/'>BlogTheWorld</a>&#8201;
-							('the/this website') and Owen M. Jones ('we', 'us', 'our'), acting in an individual capacity as the
+							<a className="link hover:font-semibold" href='/'>BlogTheWorld</a>
+							&nbsp;('the/this website') and Owen M. Jones ('we', 'us', 'our'), acting in an individual capacity as the
 							developer and administrator of the website. You agree that by accessing this website, you have read,
 							understood and agree to be bound by all of these Terms and Conditions. If you do not agree to be bound by
 							any of these Terms and Conditions, then you are prohibited from continuing to use this website and must
@@ -177,9 +177,11 @@ const TermsConditionsPage = () => {
 						</ul>
 						<h4 className="text-md pt-2 font-semibold">Privacy Policy</h4>
 						<p className="text-start">
-							We care about your privacy and the security of your data. Please review the Privacy Policy available at
-							&#8201;<a className="link hover:font-semibold" target="_blank" href="/privacy-policy">
-								{process.env.REACT_APP_ROOT_DOMAIN}/privacy-policy</a>.
+							We care about your privacy and the security of your data.
+							Please review the Privacy Policy available at&nbsp;
+							<a className="link hover:font-semibold" target="_blank" href="/privacy-policy">
+								{process.env.REACT_APP_ROOT_DOMAIN}/privacy-policy
+							</a>.
 							By continuing to use this website, you agree to the use of your data as described in the Privacy Policy.
 						</p>
 						<h4 className="text-md pt-2 font-semibold">Disclaimer</h4>

@@ -130,9 +130,10 @@ const PrivacyPolicyPage = () => {
 							through cookies or similar technology.
 						</p>
 						<p className="text-start">
-							For further information, visit&#8201;
+							For further information, visit&nbsp;
 							<a className="link hover:font-semibold" href="https://www.allaboutcookies.org" target="_blank">
-								allaboutcookies.org</a>.
+								allaboutcookies.org
+							</a>.
 						</p>
 						<h4 className="text-md pt-2 font-semibold">What cookies do we use?</h4>
 						<ul className="list-disc text-start">
@@ -147,11 +148,12 @@ const PrivacyPolicyPage = () => {
 						</ul>
 						<h4 className="text-md pt-2 font-semibold">How to manage cookies</h4>
 						<p className="text-start">
-							You can set your browser to not accept cookies, and the website&#8201;
+							You can set your browser to not accept cookies, and the website&nbsp;
 							<a className="link hover:font-semibold" href="https://www.allaboutcookies.org" target="_blank">
-								allaboutcookies.org</a>&#8201;
-							tells you how to remove cookies from your browser. However, if you do so, some features of this website
-							may not work.
+								allaboutcookies.org
+							</a>
+							&nbsp;tells you how to remove cookies from your browser. However, if you do so, some features of this
+							website may not work.
 						</p>
 						<h4 className="text-md pt-2 font-semibold">Privacy policies of other websites</h4>
 						<p className="text-start">
@@ -173,7 +175,7 @@ const PrivacyPolicyPage = () => {
 						<h4 className="text-md pt-2 font-semibold">Contact the supervisory authority</h4>
 						<p className="text-start">
 							Should you wish to report a complaint or if you feel that we have not addressed your concerns in a
-							satisfactory manner, you may contact the&#8201;
+							satisfactory manner, you may contact the&nbsp;
 							<a className="link hover:font-semibold"
 							   href="https://www.cnil.fr/fr/adresser-une-plainte"
 							   target="_blank">Commission Nationale de l'Informatique et des Libertés</a> (in French).<br/>
