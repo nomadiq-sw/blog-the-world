@@ -21,6 +21,36 @@ import {Language, Traveler, Trip} from '../utilities/enums'
 import axios from 'axios'
 import useToken from '../utilities/useToken'
 
+const getWidth = () => {
+  return Math.max(
+    document.body.scrollWidth,
+    document.documentElement.scrollWidth,
+    document.body.offsetWidth,
+    document.documentElement.offsetWidth,
+    document.documentElement.clientWidth
+  )
+}
+
+const mapOptionsCreator = (map) => {
+	let zoomControlShow = getWidth() > 992
+	console.log("zoomControlShow =", zoomControlShow)
+	return {
+		minZoomOverride: true,
+		minZoom: 2.5,
+		fullscreenControl: false,
+		zoomControl: zoomControlShow,
+		restriction: {
+			latLngBounds: {
+				north: 85,
+				south: -85,
+				west: -180,
+				east: 180
+			}
+		},
+		libraries: 'places',
+	}
+}
+
 const SimpleMap = () => {
 	const [gmap, setGmap] = useState()
 	const [googlemaps, setGooglemaps] = useState()
@@ -201,20 +231,7 @@ const SimpleMap = () => {
 					bootstrapURLKeys={{ key: process.env.REACT_APP_MAPS_API_KEY, libraries: 'places' }}
           defaultCenter={defaultCenter}
           defaultZoom={defaultZoom}
-					options={{
-						minZoomOverride: true,
-						minZoom: 2.5,
-						fullscreenControl: false,
-						restriction: {
-							latLngBounds: {
-								north: 85,
-								south: -85,
-								west: -180,
-								east: 180
-							}
-						},
-						libraries: 'places',
-					}}
+					options={mapOptionsCreator}
 					yesIWantToUseGoogleMapApiInternals
 					onGoogleApiLoaded={({map, maps}) => handleGoogleApiLoaded(map, maps)}
 					onChange = {({center, zoom, bounds, ...other}) => {setMenuState(false)}}
