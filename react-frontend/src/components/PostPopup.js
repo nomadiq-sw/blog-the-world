@@ -15,8 +15,8 @@ import Popup from 'reactjs-popup'
 const PostPopup = ({post, trigger}) => {
 	const dateString = new Date(post.date).toLocaleDateString()
 	const postUrl = new URL(post.url)
-	const postBaseUrl = postUrl.protocol + postUrl.hostname
-	const postDomain = postUrl.hostname.replace('www', '')
+	const postBaseUrl = postUrl.origin
+	const postDomain = postUrl.hostname.replace('www.', '')
 
 	return (
 		<Popup trigger={trigger}
