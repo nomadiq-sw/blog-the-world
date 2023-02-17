@@ -250,12 +250,12 @@ const SimpleMap = () => {
 					              initLng={menuPosition.lng}
 					              handlePostUpdate={handlePostUpdate}/>
 					{pins.map((pin) => (
-						<Marker
-							key={pin.id}
-							post={pin}
-							lat={pin.latitude}
-							lng={pin.longitude}
-						/>
+							<Marker
+								key={pin.id}
+								post={pin}
+								lat={pin.latitude}
+								lng={pin.longitude}
+							/>
 					))}
 				</GoogleMapReact>
 			</div>

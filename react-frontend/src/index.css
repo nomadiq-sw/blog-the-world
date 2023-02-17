@@ -33,3 +33,10 @@ code {
 .dropdown-toggle::after {
   display: none !important;
 }
+
+.popover .popover-arrow::before, .popover .popover-arrow::after {
+  border-color: #212529 !important;
+	opacity: 0.5;
+  border-top-color: transparent !important;
+  border-bottom-color: transparent !important;
+}
