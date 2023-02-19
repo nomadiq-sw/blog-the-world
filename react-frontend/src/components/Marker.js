@@ -42,6 +42,7 @@ const Marker = ({post}) => {
 		<Popover className='bg-dark bg-opacity-75'
 		         onMouseEnter={() => setShowPopover(true)}
 		         onMouseLeave={() => setShowPopover(false)}
+		         onPointerDown={() => setShowPopover(true)}
 		         {...props}>
 			<Popover.Body>
 				<div>
@@ -62,7 +63,7 @@ const Marker = ({post}) => {
 	)
 
 	return (
-		<OverlayTrigger trigger={['hover', 'focus', 'click']}
+		<OverlayTrigger trigger={['hover', 'focus']}
 		                placement='auto'
 		                overlay={renderPopup}
 		                show={showPopover}>
