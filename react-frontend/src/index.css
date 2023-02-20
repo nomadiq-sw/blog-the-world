@@ -34,9 +34,23 @@ code {
   display: none !important;
 }
 
-.popover .popover-arrow::before, .popover .popover-arrow::after {
-  border-color: #212529 !important;
-	opacity: 0.5;
-  border-top-color: transparent !important;
-  border-bottom-color: transparent !important;
+.popover .popover-arrow {
+	display: block;
+	opacity: 0.75;
+}
+
+.popover[x-placement^=top]>.popover-arrow:after {
+    border-top-color: #212529;
+}
+
+.popover[x-placement^=bottom]>.popover-arrow:after {
+    border-bottom-color: #212529;
+}
+
+.popover[x-placement^=right]>.popover-arrow:after {
+    border-right-color: #212529;
+}
+
+.popover[x-placement^=left]>.popover-arrow:after {
+    border-left-color: #212529;
 }
