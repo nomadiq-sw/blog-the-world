@@ -15,21 +15,22 @@ import styled from 'styled-components'
 import {OverlayTrigger, Popover} from 'react-bootstrap'
 
 const MarkerDiv =	styled.div`
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		width: 14px;
-		height: 14px;
-		opacity: ${(props) => (props.verified ? 1.0 : 0.4)};
-		background-color: ${(props) => (props.verified ? 'var(--bs-primary)' : 'var(--bs-secondary)')};
-		border: 2px solid #fff;
-		border-radius: 100%;
-		user-select: none;
-		transform: translate(-50%, -50%);
-		cursor: ${(props) => (props.onMouseOver ? 'pointer' : 'default')};
-		&:hover {
-			z-index: 1;
-		}`
+	touch-action: none;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 14px;
+	height: 14px;
+	opacity: ${(props) => (props.verified ? 1.0 : 0.4)};
+	background-color: ${(props) => (props.verified ? 'var(--bs-primary)' : 'var(--bs-secondary)')};
+	border: 2px solid #fff;
+	border-radius: 100%;
+	user-select: none;
+	transform: translate(-50%, -50%);
+	cursor: ${(props) => (props.onMouseOver ? 'pointer' : 'default')};
+	&:hover {
+		z-index: 1;
+	}`
 
 const Marker = ({post}) => {
 	const [showPopover, setShowPopover] = useState(false)
@@ -66,7 +67,8 @@ const Marker = ({post}) => {
 		<OverlayTrigger trigger={['hover', 'focus']}
 		                placement='auto'
 		                overlay={renderPopup}
-		                show={showPopover}>
+		                show={showPopover}
+		                style={{ touchAction:'none' }}>
 			<MarkerDiv verified={post.verified}
 			           className={'marker' + post.id}
 			           onMouseEnter={() => setShowPopover(true)}
