@@ -10,7 +10,7 @@
 //
 // You should have received a copy of the GNU Affero General Public License along with BlogTheWorld. If not, see <https://www.gnu.org/licenses/>.
 
-import React, {useState, useRef} from 'react'
+import React, {useState, useRef, useEffect} from 'react'
 import {
   Alert,
   Button,
@@ -45,7 +45,30 @@ const LoginSidebar = (props) => {
   const emailRef = useRef()
   const validFormRef = useRef(false)
   const {setToken, getToken, removeToken} = useToken()
-  const [loggedIn, setLoggedIn] = useState(getToken)
+  const [loggedIn, setLoggedIn] = useState(getToken && getToken() !== 'null')
+
+  useEffect(() => {
+    const tokenIsValid = () => {
+      const token = getToken()
+      if (token && token !== 'null') {
+        const headers = {'Authorization': `Bearer ${token}`}
+        axios.get(
+          process.env.REACT_APP_FLASK_API_URL + '/refresh',
+          {
+            headers: headers
+          }
+        ).then((response) => {
+          setToken(response.data.access_token)
+          setLoggedIn(true)
+        }).catch(() => {
+          setToken(null)
+          setLoggedIn(false)
+        })
+      }
+      else { setLoggedIn(false) }
+    }
+    tokenIsValid()
+  }, [])
 
   const handleClose = () => {
     setShow(false)
