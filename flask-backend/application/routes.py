@@ -24,7 +24,8 @@ from flask_praetorian.exceptions import (
 	InvalidResetToken,
 	MissingToken,
 	MisusedResetToken,
-	MisusedRegistrationToken
+	MisusedRegistrationToken,
+	EarlyRefreshError
 )
 from .models import Languages, TravelerTypes, TripTypes, User, Post, db
 
@@ -114,6 +115,24 @@ def login():
 	password = req.get("password", None)
 	user = guard.authenticate(email, password)
 	ret = {"access_token": guard.encode_jwt_token(user)}
+	return jsonify(ret), 200
+
+
+@api.route('/refresh', methods=['GET'])
+def refresh():
+	"""
+	Refreshes an existing JWT by creating a new one that is a copy of the old
+	except that it has a refreshed access expiration.
+	.. example::
+		$ curl http://localhost:5000/refresh -X GET \
+			-H "Authorization: Bearer <your_token>"
+	"""
+	old_token = guard.read_token_from_header()
+	try:
+		new_token = guard.refresh_jwt_token(old_token)
+	except EarlyRefreshError:
+		new_token = old_token
+	ret = {'access_token': new_token}
 	return jsonify(ret), 200
 
 
