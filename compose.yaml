@@ -9,8 +9,5 @@ services:
   react:
     build: react-frontend
     ports:
-      - 80:80
-      - 443:443
-    volumes:
-      - ./react-frontend/certs:/etc/nginx/certs
+      - 3000:80
     restart: always

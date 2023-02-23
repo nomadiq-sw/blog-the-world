@@ -1,0 +1,18 @@
+services:
+  flask:
+    build: flask-backend
+    env_file:
+      - flask-backend/.env
+    expose:
+      - 5000
+    restart: always
+  react:
+    build:
+        context: react-frontend
+        dockerfile: Dockerfile.prod
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./react-frontend/certs:/etc/nginx/certs
+    restart: always
