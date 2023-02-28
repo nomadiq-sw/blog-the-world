@@ -1,6 +1,5 @@
 {
-	"short_name": "BlogTheWorld",
-	"name": "BlogTheWorld: pin and find travel blog posts",
+	"name": "BlogTheWorld",
 	"icons": [
 		{
 			"src": "favicon.ico",
